@@ -1,7 +1,7 @@
 ```markdown
 # 🔨 Study Forge
 
-> Transform your lecture materials (PDFs, PowerPoints, Word docs) into organized, searchable study notes using a team of AI assistants working together.
+> Transform your lecture materials (PDFs, PowerPoints, Word docs) into organized, **color-coded** study notes using a team of AI assistants working together.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
@@ -17,7 +17,16 @@ Drop any lecture file into the `uploads` folder, and Study Forge:
    - Another **extracts key terms and definitions**
    - A third **generates flashcards** for review
    - A "judge" AI **combines** the best results
-3. **Sends** the organized notes to Notion with:
+3. **Color-codes** your notes so you can instantly identify:
+   - **Main topics** (Black)
+   - **Standard notes** (Blue)
+   - **MRI protocols & positioning** (Light Blue)
+   - **Anatomy & pathologies** (Navy)
+   - **Physics & formulas** (Purple)
+   - **Safety & contraindications** (Pink)
+   - **Professor tips & clinical applications** (Green)
+   - **Corrections & emphasis** (Red)
+4. **Sends** the organized, color-coded notes to Notion with:
    - Concise summary
    - Bullet-point key takeaways
    - Important definitions
@@ -25,6 +34,32 @@ Drop any lecture file into the `uploads` folder, and Study Forge:
    - Source file name and date
 
 All of this runs **100% free** on your own computer — no API costs, no subscriptions.
+
+---
+
+## 🎨 Color-Coding System
+
+Study Forge automatically color-codes your notes so you can instantly identify different types of content:
+
+| Color | Hex Code | Category | Use Case |
+|-------|----------|----------|----------|
+| **Black** | `#000000` | Main Topics / Headers | Top-level headings, section titles |
+| **Blue** | `#0000FF` | Standard In-class Notes | General lecture notes |
+| **Light Blue** | `#ADD8E6` | MRI Scanning Protocols / Patient Positioning | Scanning procedures, positioning techniques |
+| **Navy** | `#000080` | Anatomical Structures / Pathologies | Body parts, diseases, conditions |
+| **Purple** | `#800080` | Physics / Math / Formulas | MRI physics, math, formulas |
+| **Pink** | `#FF69B4` | Clinical Red Flags / Contraindications / Safety | Safety warnings, things to check |
+| **Green** | `#008000` | Professor Tips / "Go" items / Clinical Application | What to do, how to apply knowledge |
+| **Red** | `#FF0000` | Corrections / Professor Emphasis / Edits | Warnings, clarifications, high-priority info |
+
+**Example Notion Entry:**
+```
+🔴 Red: This is what the professor emphasized — will be on the exam.
+🟣 Purple: Formula for MRI signal-to-noise ratio: SNR = ...
+🔵 Blue: Standard note about the patient being supine.
+💚 Green: Professor tip — use the "Right Hand Rule" for gradient orientation.
+🩷 Pink: Contraindication: Patient with pacemaker CANNOT undergo MRI!
+```
 
 ---
 
@@ -127,6 +162,8 @@ You should get a response from the AI!
    - Definitions (Text)
    - Flashcards (Text)
    - Source File (Text)
+   - Course (Select) — add your 4 courses
+   - Color-Coded Notes (Text)
    - Date (Date)
 
 **Get your API key (this lets the script talk to Notion):**
@@ -257,6 +294,7 @@ python3 main.py
    🔑 Key Points AI: Done
    📚 Flashcards AI: Done
    ⚖️ Judge AI: Synthesizing results...
+   🎨 Color Coding: Applied
    ✅ Done! Check Notion
 
 📊 All files processed! Check Notion for your organized notes.
@@ -273,6 +311,7 @@ python3 main.py
    - A summary
    - Key bullet points
    - Flashcards for review
+   - **Color-coded sections** so you can instantly identify content types
 
 ---
 
@@ -288,6 +327,7 @@ This system uses a team of specialized AIs that collaborate:
 | **Key Points** | Extracts the most important information | llama3.2:3b |
 | **Flashcards** | Creates Q&A pairs for review | mistral:7b |
 | **Definitions** | Identifies and explains key terms | llama3.2:3b |
+| **Color Coder** | Assigns color codes based on content type | llama3.2:3b |
 | **Judge** | Reviews all outputs and creates the final version | mistral:7b |
 
 ### How They Work Together
@@ -317,8 +357,16 @@ This system uses a team of specialized AIs that collaborate:
                    └────────┬────────┘
                             ▼
                    ┌─────────────────┐
+                   │  Color Coder AI │
+                   │  (Assigns       │
+                   │   colors by     │
+                   │   content type) │
+                   └────────┬────────┘
+                            ▼
+                   ┌─────────────────┐
                    │   Notion        │
-                   │  (Organized)    │
+                   │  (Organized +   │
+                   │   Color-Coded)  │
                    └─────────────────┘
 ```
 
@@ -330,6 +378,7 @@ This system uses a team of specialized AIs that collaborate:
 | Can get confused by complex content | Each expert focuses on what it does best |
 | One perspective | Multiple perspectives on your lecture |
 | Harder to verify correctness | Judge AI reviews and improves the output |
+| No visual organization | **Color coding makes key info pop instantly** |
 
 ---
 
@@ -352,8 +401,14 @@ study-forge/
 
 1. **Before studying:** Drop your lecture PDF/PPT in the `uploads` folder
 2. **Run the script:** `python main.py` in Terminal
-3. **Open Notion:** Your notes are already organized and summarized
-4. **Study:** Review the summary, key points, and flashcards
+3. **Open Notion:** Your notes are already organized, summarized, and **color-coded**
+4. **Study:** Review the summary, key points, flashcards, and **instantly spot**:
+   - 🩷 Safety warnings (Pink)
+   - 🟣 Physics formulas (Purple)
+   - 💚 Clinical applications (Green)
+   - 🔴 Professor emphasis (Red)
+   - 🔵 Standard notes (Blue)
+   - ⚫ Main topics (Black)
 
 ---
 
@@ -403,25 +458,44 @@ Want to change how the AIs work? Open `main.py` and look for these sections:
 SUMMARIZER_MODEL = "llama3.2:3b"      # Change to any downloaded model
 KEY_POINTS_MODEL = "llama3.2:3b"      # Change to any downloaded model
 FLASHCARDS_MODEL = "mistral:7b"       # Change to any downloaded model
+DEFINITIONS_MODEL = "llama3.2:3b"     # Change to any downloaded model
+COLOR_CODER_MODEL = "llama3.2:3b"     # Change to any downloaded model
 JUDGE_MODEL = "mistral:7b"            # Change to any downloaded model
 ```
 
-### Download More Models
-```bash
-ollama pull phi3           # Smaller, faster
-ollama pull llama3.2:1b    # Very fast, less accurate
-ollama pull llama3.1:8b    # Bigger, more accurate
-ollama pull llama3.3:70b   # Huge, most accurate (needs lots of RAM)
+### Customize the Color-Coding System
+You can modify the color codes and categories in `main.py`:
+
+```python
+COLOR_MAP = {
+    "main_topic": "#000000",
+    "standard_note": "#0000FF",
+    "mri_protocol": "#ADD8E6",
+    "anatomy": "#000080",
+    "physics": "#800080",
+    "safety": "#FF69B4",
+    "clinical_tip": "#008000",
+    "emphasis": "#FF0000"
+}
 ```
 
 ### Change What the AIs Do
 You can modify the prompts in `main.py` to make the AIs do different things:
 
 ```python
-# Change the Summarizer's instructions:
-SUMMARIZER_SYSTEM = """You are a teaching assistant. 
-Write a 2-paragraph summary of this lecture that a fellow student would find easy to understand.
-Focus on the big picture, not small details."""
+# Change the Color Coder's instructions:
+COLOR_CODER_SYSTEM = """You are an expert at categorizing educational content.
+For each section of these notes, assign a color from the following categories:
+- BLACK: Main topics and headers
+- BLUE: Standard lecture notes
+- LIGHT BLUE: MRI scanning protocols and patient positioning
+- NAVY: Anatomical structures and pathologies
+- PURPLE: Physics, math, and formulas
+- PINK: Clinical red flags, contraindications, and safety warnings
+- GREEN: Professor tips, "go" items, and clinical applications
+- RED: Corrections, professor emphasis, and edits
+
+Return a color-coded version of the text with color labels."""
 ```
 
 ---
@@ -470,6 +544,7 @@ Once this is working, you can add:
 3. **Weekly review** — Run the script on a whole week of notes at once
 4. **Obsidian sync** — Push notes to Obsidian with the Local REST API plugin
 5. **Web interface** — A simple drag-and-drop UI
+6. **Custom color schemes** — Adjust colors for different courses or topics
 
 ---
 
@@ -500,17 +575,19 @@ This means:
 
 **🎉 Congratulations! You now have a multi-AI study assistant that will save you hours of studying!**
 
-```
-
 ---
 
-This README is now complete and ready to be the main documentation for your Study Forge repository. It includes:
+## 🧠 MRI AAS Program Focus
 
-- ✅ Complete beginner-friendly setup guide
-- ✅ Clear explanation of how the AI team works
-- ✅ Visual diagrams
-- ✅ Troubleshooting section
-- ✅ Customization instructions
-- ✅ License and contribution info
+Study Forge is designed with your MRI AAS program in mind. The color-coding system was built specifically to help you quickly identify:
 
-Once you create the repository, you can copy-paste this into the README.md file. Let me know when you're ready for the `main.py` code and other files!
+- **🩷 Safety warnings** (Pink) — Critical for patient safety
+- **🟣 Physics formulas** (Purple) — MRI physics and math
+- **💚 Clinical applications** (Green) — What to do in practice
+- **🔵 Standard notes** (Blue) — General lecture content
+- **⚫ Main topics** (Black) — Headers and structure
+- **🩵 MRI Protocols** (Light Blue) — Scanning procedures and positioning
+- **🔵 Anatomy** (Navy) — Body structures and pathologies
+- **🔴 Emphasis** (Red) — Professor corrections and exam tips
+
+**This system helps you focus on what matters most for your career.**
