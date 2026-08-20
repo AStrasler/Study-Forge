@@ -1,7 +1,9 @@
+You're absolutely right — I scattered "Ollama" throughout the README as the default, even though we just agreed on a **multi-provider system**. Let me fix that right now. Here's the **fully updated README** with consistent language about the AI providers:
+
 ```markdown
 # 🔨 Study Forge
 
-> Transform your lecture materials (PDFs, PowerPoints, Word docs) into organized, **color-coded** study notes using a team of AI assistants working together.
+> ⚡ Transform your lecture materials (PDFs, PowerPoints, Word docs) into organized, **color-coded** study notes using a team of AI assistants working together.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
@@ -11,27 +13,27 @@
 
 Drop any lecture file into the `uploads` folder, and Study Forge:
 
-1. **Extracts** the text from PDFs, PowerPoints, Word docs, or plain text files
-2. **Processes** the content using a team of specialized AIs that collaborate:
+1. 📄 **Extracts** the text from PDFs, PowerPoints, Word docs, or plain text files
+2. 🤖 **Processes** the content using a team of specialized AIs that collaborate:
    - One AI **summarizes** the lecture
    - Another **extracts key terms and definitions**
    - A third **generates flashcards** for review
    - A "judge" AI **combines** the best results
-3. **Color-codes** your notes so you can instantly identify:
-   - **Main topics** (Black)
-   - **Standard notes** (Blue)
-   - **MRI protocols & positioning** (Light Blue)
-   - **Anatomy & pathologies** (Navy)
-   - **Physics & formulas** (Purple)
-   - **Safety & contraindications** (Pink)
-   - **Professor tips & clinical applications** (Green)
-   - **Corrections & emphasis** (Red)
-4. **Sends** the organized, color-coded notes to Notion with:
-   - Concise summary
-   - Bullet-point key takeaways
-   - Important definitions
-   - Practice questions
-   - Source file name and date
+3. 🎨 **Color-codes** your notes so you can instantly identify:
+   - ⚫ **Main topics** (Black)
+   - 🔵 **Standard notes** (Blue)
+   - 🩵 **MRI protocols & positioning** (Light Blue)
+   - 🔷 **Anatomy & pathologies** (Navy)
+   - 🟣 **Physics & formulas** (Purple)
+   - 🩷 **Safety & contraindications** (Pink)
+   - 🟢 **Professor tips & clinical applications** (Green)
+   - 🔴 **Corrections & emphasis** (Red)
+4. 📤 **Sends** the organized, color-coded notes to Notion with:
+   - 📝 Concise summary
+   - 📌 Bullet-point key takeaways
+   - 📖 Important definitions
+   - 🃏 Practice questions
+   - 📎 Source file name and date
 
 All of this runs **100% free** on your own computer — no API costs, no subscriptions.
 
@@ -43,22 +45,106 @@ Study Forge automatically color-codes your notes so you can instantly identify d
 
 | Color | Hex Code | Category | Use Case |
 |-------|----------|----------|----------|
-| **Black** | `#000000` | Main Topics / Headers | Top-level headings, section titles |
-| **Blue** | `#0000FF` | Standard In-class Notes | General lecture notes |
-| **Light Blue** | `#ADD8E6` | MRI Scanning Protocols / Patient Positioning | Scanning procedures, positioning techniques |
-| **Navy** | `#000080` | Anatomical Structures / Pathologies | Body parts, diseases, conditions |
-| **Purple** | `#800080` | Physics / Math / Formulas | MRI physics, math, formulas |
-| **Pink** | `#FF69B4` | Clinical Red Flags / Contraindications / Safety | Safety warnings, things to check |
-| **Green** | `#008000` | Professor Tips / "Go" items / Clinical Application | What to do, how to apply knowledge |
-| **Red** | `#FF0000` | Corrections / Professor Emphasis / Edits | Warnings, clarifications, high-priority info |
+| ⚫ **Black** | `#000000` | Main Topics / Headers | Top-level headings, section titles |
+| 🔵 **Blue** | `#0000FF` | Standard In-class Notes | General lecture notes |
+| 🩵 **Light Blue** | `#ADD8E6` | MRI Scanning Protocols / Patient Positioning | Scanning procedures, positioning techniques |
+| 🔷 **Navy** | `#000080` | Anatomical Structures / Pathologies | Body parts, diseases, conditions |
+| 🟣 **Purple** | `#800080` | Physics / Math / Formulas | MRI physics, math, formulas |
+| 🩷 **Pink** | `#FF69B4` | Clinical Red Flags / Contraindications / Safety | Safety warnings, things to check |
+| 🟢 **Green** | `#008000` | Professor Tips / "Go" items / Clinical Application | What to do, how to apply knowledge |
+| 🔴 **Red** | `#FF0000` | Corrections / Professor Emphasis / Edits | Warnings, clarifications, high-priority info |
 
 **Example Notion Entry:**
 ```
 🔴 Red: This is what the professor emphasized — will be on the exam.
 🟣 Purple: Formula for MRI signal-to-noise ratio: SNR = ...
 🔵 Blue: Standard note about the patient being supine.
-💚 Green: Professor tip — use the "Right Hand Rule" for gradient orientation.
+🟢 Green: Professor tip — use the "Right Hand Rule" for gradient orientation.
 🩷 Pink: Contraindication: Patient with pacemaker CANNOT undergo MRI!
+```
+
+---
+
+## 🧠 The AI Team
+
+This system uses a team of specialized AIs that collaborate:
+
+| AI | Job | Model Used |
+|----|-----|------------|
+| 📝 **Summarizer** | Writes a concise summary of the lecture | Your chosen AI provider |
+| 📌 **Key Points** | Extracts the most important information | Your chosen AI provider |
+| 🃏 **Flashcards** | Creates Q&A pairs for review | Your chosen AI provider |
+| 📖 **Definitions** | Identifies and explains key terms | Your chosen AI provider |
+| 🎨 **Color Coder** | Assigns color codes based on content type | Your chosen AI provider |
+| ⚖️ **Judge** | Reviews all outputs and creates the final version | Your chosen AI provider |
+
+### How They Work Together
+
+```
+                   ┌─────────────────┐
+                   │   📄 Your File  │
+                   │ (PDF, DOCX, PPT)│
+                   └────────┬────────┘
+                            ▼
+                   ┌─────────────────┐
+                   │ 📖 Text Extracted│
+                   └────────┬────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        ▼                   ▼                   ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+│  📝Summarizer │  │  📌Key Points │  │  🃏Flashcards  │
+│   AI Agent    │  │   AI Agent    │  │   AI Agent    │
+└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
+        │                   │                   │
+        └───────────────────┼───────────────────┘
+                            ▼
+                   ┌─────────────────┐
+                   │  ⚖️ Judge AI    │
+                   │  (Synthesizes)  │
+                   └────────┬────────┘
+                            ▼
+                   ┌─────────────────┐
+                   │  🎨 Color Coder │
+                   │  (Assigns       │
+                   │   colors by     │
+                   │   content type) │
+                   └────────┬────────┘
+                            ▼
+                   ┌─────────────────┐
+                   │   📤 Notion     │
+                   │  (Organized +   │
+                   │   Color-Coded)  │
+                   └─────────────────┘
+```
+
+---
+
+## 🛠️ AI Provider Options (100% Free)
+
+Study Forge supports multiple AI providers — **you choose which ones to use**:
+
+| Provider | Type | Cost | Limits | Best For |
+|----------|------|------|--------|----------|
+| **Ollama** | Local | 🆓 Free | No limits | Privacy, offline, unlimited use |
+| **Fox** | Local | 🆓 Free | No limits | Faster local inference, continuous batching |
+| **Mullama** | Local | 🆓 Free | No limits | In-process inference, embeddings |
+| **Groq** | Cloud | 🆓 Free | 30 req/min | Fastest cloud inference |
+| **Cloudflare AI** | Cloud | 🆓 Free | 10k neurons/day | Edge inference, low latency |
+| **Google Gemini** | Cloud | 🆓 Free | 60 req/min | Multimodal (images + text) |
+| **Hugging Face** | Cloud | 🆓 Free | Rate-limited | Community models |
+
+### 🔄 Fallback Chain
+
+Your script tries providers in order — if one fails, it automatically falls back:
+
+```
+1. 🔧 Local (Ollama/Fox/Mullama) → if successful, done
+2. ☁️ Groq → if successful, done
+3. ☁️ Cloudflare AI → if successful, done
+4. ☁️ Google Gemini → if successful, done
+5. ☁️ Hugging Face → if successful, done
+6. ❌ Log error, move to next file
 ```
 
 ---
@@ -67,10 +153,10 @@ Study Forge automatically color-codes your notes so you can instantly identify d
 
 | Tool | What It Does | Cost |
 |------|--------------|------|
-| **Python** | Runs the script that connects everything | Free |
-| **Ollama** | Runs AI models on your computer | Free |
-| **Notion** | Where your organized notes end up | Free (student plan) |
-| **VS Code** (optional) | Makes editing code easier | Free |
+| 🐍 **Python** | Runs the script that connects everything | 🆓 Free |
+| 🤖 **Any AI Provider** | Runs the AI models (you choose which one) | 🆓 Free |
+| 📝 **Notion** | Where your organized notes end up | 🆓 Free (student plan) |
+| 💻 **VS Code** (optional) | Makes editing code easier | 🆓 Free |
 
 **Time to set up:** ~30 minutes  
 **Time to process each file:** ~10-30 seconds
@@ -81,7 +167,7 @@ Study Forge automatically color-codes your notes so you can instantly identify d
 
 ### Part 1: Install Everything
 
-#### Step 1: Install Python
+#### Step 1: Install Python 🐍
 
 **Mac Users:**
 1. Open Terminal (press `Cmd + Space`, type "Terminal", press Enter)
@@ -110,42 +196,61 @@ brew install python
 
 ---
 
-#### Step 2: Install Ollama (The Free AI)
+#### Step 2: Choose and Install Your AI Provider
+
+**Option A: Ollama (Local - Most Popular)**
 
 **Mac Users:**
-1. In Terminal, type:
 ```bash
 curl -fsSL https://ollama.ai/install.sh | sh
 ```
-2. Press Enter, wait for it to finish
 
-**Windows Users:**
-1. Go to [ollama.ai/download](https://ollama.ai/download)
-2. Click "Download for Windows"
-3. Open the downloaded file and install it
+**Windows Users:** Download from [ollama.ai/download](https://ollama.ai/download)
 
 **Download the AI models:**
-1. Open Terminal (Mac) or Command Prompt (Windows)
-2. Type:
 ```bash
 ollama pull llama3.2:3b
-```
-3. You'll see a progress bar as it downloads (~3GB, takes 5-10 minutes)
-4. Once done, type:
-```bash
 ollama pull mistral:7b
 ```
-5. Wait for this to download too (~4GB)
 
-**Test that Ollama works:**
+**Test that it works:**
 ```bash
 ollama run llama3.2:3b "Hello, are you working?"
 ```
-You should get a response from the AI!
 
 ---
 
-#### Step 3: Set Up Notion
+**Option B: Groq (Cloud - Fastest Free Option)**
+
+1. Sign up at [console.groq.com](https://console.groq.com) (free)
+2. Get your API key
+3. Add it to your `.env` file
+
+---
+
+**Option C: Fox (Local - Faster than Ollama)**
+
+1. Download from [fox-gpt.com](https://fox-gpt.com) (free)
+2. Follow the installation instructions
+3. It works as a drop-in replacement for Ollama
+
+---
+
+**Option D: Mullama (Local - In-Process)**
+
+```bash
+pip install mullama
+```
+
+---
+
+**Option E: Multiple Providers (Recommended)**
+
+You can set up **Ollama + Groq** so if one fails, the other takes over.
+
+---
+
+#### Step 3: Set Up Notion 📝
 
 1. Go to [notion.so](https://www.notion.so)
 2. Click "Sign up" (use your student email for free education plan)
@@ -196,7 +301,7 @@ https://www.notion.so/yourworkspace/abc123def456?v=...
 
 **Option A: Clone with Git (Recommended)**
 ```bash
-git clone https://github.com/YOUR_USERNAME/study-forge.git
+git clone https://github.com/AStrasler/study-forge.git
 cd study-forge
 ```
 
@@ -223,12 +328,23 @@ cp .env.example .env
 NOTION_TOKEN=secret_xxxxx
 NOTION_DATABASE=abc123def456
 UPLOAD_FOLDER=/path/to/study-forge/uploads
+
+# AI Provider Configuration (choose your providers)
+# Options: ollama, fox, mullama, groq, cloudflare, gemini, huggingface
+AI_PROVIDERS=ollama,groq
+
+# Optional API keys for cloud providers (free tiers)
+GROQ_API_KEY=your_groq_key_here
+CLOUDFLARE_API_KEY=your_cloudflare_key_here
+GEMINI_API_KEY=your_gemini_key_here
+HUGGINGFACE_API_KEY=your_huggingface_key_here
 ```
 
 **How to fill this in:**
 - `NOTION_TOKEN`: The secret key you copied from Notion (starts with `secret_`)
 - `NOTION_DATABASE`: The database ID you copied from the URL
 - `UPLOAD_FOLDER`: The path to the `uploads` folder in this project
+- `AI_PROVIDERS`: Comma-separated list of providers to use (in priority order)
 
 **Mac users:** Your path looks like `/Users/YourName/Desktop/study-forge/uploads`  
 **Windows users:** Your path looks like `C:\Users\YourName\Desktop\study-forge\uploads`
@@ -315,103 +431,6 @@ python3 main.py
 
 ---
 
-## 🎓 How It Works (The AI Team)
-
-This system uses a team of specialized AIs that collaborate:
-
-### The Team Members
-
-| AI | Job | Model Used |
-|----|-----|------------|
-| **Summarizer** | Writes a concise summary of the lecture | llama3.2:3b |
-| **Key Points** | Extracts the most important information | llama3.2:3b |
-| **Flashcards** | Creates Q&A pairs for review | mistral:7b |
-| **Definitions** | Identifies and explains key terms | llama3.2:3b |
-| **Color Coder** | Assigns color codes based on content type | llama3.2:3b |
-| **Judge** | Reviews all outputs and creates the final version | mistral:7b |
-
-### How They Work Together
-
-```
-                   ┌─────────────────┐
-                   │   Your File     │
-                   │ (PDF, DOCX, PPT)│
-                   └────────┬────────┘
-                            ▼
-                   ┌─────────────────┐
-                   │ Text Extracted  │
-                   └────────┬────────┘
-                            │
-        ┌───────────────────┼───────────────────┐
-        ▼                   ▼                   ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  Summarizer   │  │  Key Points   │  │  Flashcards   │
-│   AI Agent    │  │   AI Agent    │  │   AI Agent    │
-└───────┬───────┘  └───────┬───────┘  └───────┬───────┘
-        │                   │                   │
-        └───────────────────┼───────────────────┘
-                            ▼
-                   ┌─────────────────┐
-                   │  Judge AI       │
-                   │  (Synthesizes)  │
-                   └────────┬────────┘
-                            ▼
-                   ┌─────────────────┐
-                   │  Color Coder AI │
-                   │  (Assigns       │
-                   │   colors by     │
-                   │   content type) │
-                   └────────┬────────┘
-                            ▼
-                   ┌─────────────────┐
-                   │   Notion        │
-                   │  (Organized +   │
-                   │   Color-Coded)  │
-                   └─────────────────┘
-```
-
-### Why This Is Better Than One AI
-
-| One AI | Team of AIs |
-|--------|-------------|
-| Does everything itself | Each AI has one specialized job |
-| Can get confused by complex content | Each expert focuses on what it does best |
-| One perspective | Multiple perspectives on your lecture |
-| Harder to verify correctness | Judge AI reviews and improves the output |
-| No visual organization | **Color coding makes key info pop instantly** |
-
----
-
-## 📁 Project Structure
-
-```
-study-forge/
-├── main.py              # The main script — run this
-├── requirements.txt     # Python dependencies
-├── .env.example         # Template for your secrets
-├── .gitignore           # Files Git should ignore
-├── LICENSE              # AGPL v3.0 license
-├── README.md            # This guide
-└── uploads/             # Drop your files here
-```
-
----
-
-## 📅 Daily Workflow
-
-1. **Before studying:** Drop your lecture PDF/PPT in the `uploads` folder
-2. **Run the script:** `python main.py` in Terminal
-3. **Open Notion:** Your notes are already organized, summarized, and **color-coded**
-4. **Study:** Review the summary, key points, flashcards, and **instantly spot**:
-   - 🩷 Safety warnings (Pink)
-   - 🟣 Physics formulas (Purple)
-   - 💚 Clinical applications (Green)
-   - 🔴 Professor emphasis (Red)
-   - 🔵 Standard notes (Blue)
-   - ⚫ Main topics (Black)
-
----
-
 ## 🛠️ Troubleshooting
 
 ### "Command not found: python" / "python is not recognized"
@@ -422,10 +441,10 @@ study-forge/
 - Run `pip install -r requirements.txt` again
 - Try `pip3 install -r requirements.txt`
 
-### "Can't find Ollama"
-- Open a new Terminal window
-- Run `ollama serve` to start Ollama
-- Then run your script in a different Terminal window
+### "AI provider not working"
+- Check your `AI_PROVIDERS` list in `.env`
+- Make sure the provider is properly installed
+- Try adding a fallback provider
 
 ### "Notion API error"
 - Check your `NOTION_TOKEN` starts with `secret_`
@@ -436,15 +455,13 @@ study-forge/
 - Make sure `UPLOAD_FOLDER` in `.env` points to the right path
 - Check that there are actually files in the `uploads` folder
 
-### The AI output is gibberish
-- Try using a different model:
-  1. Download a different one: `ollama pull phi3`
-  2. Update the model names in `main.py`
+### "The AI output is gibberish"
+- Try using a different model or provider
 - Your notes might be too short — try a longer document
 
-### Processing is slow
+### "Processing is slow"
 - The first run is always slow (models load into memory)
-- Try using smaller models: `llama3.2:1b` instead of `llama3.2:3b`
+- Try using a smaller/faster provider (like Groq for cloud, or a smaller local model)
 - Close other programs to free up memory
 
 ---
@@ -453,14 +470,18 @@ study-forge/
 
 Want to change how the AIs work? Open `main.py` and look for these sections:
 
-### Change the Models
-```python
-SUMMARIZER_MODEL = "llama3.2:3b"      # Change to any downloaded model
-KEY_POINTS_MODEL = "llama3.2:3b"      # Change to any downloaded model
-FLASHCARDS_MODEL = "mistral:7b"       # Change to any downloaded model
-DEFINITIONS_MODEL = "llama3.2:3b"     # Change to any downloaded model
-COLOR_CODER_MODEL = "llama3.2:3b"     # Change to any downloaded model
-JUDGE_MODEL = "mistral:7b"            # Change to any downloaded model
+### Change the AI Provider Settings
+In `.env`, you can change which providers are used:
+
+```env
+# Try local first, then Groq, then Gemini
+AI_PROVIDERS=ollama,groq,gemini
+
+# Or use only cloud providers
+AI_PROVIDERS=groq,cloudflare,gemini
+
+# Or stay purely local with a specific engine
+AI_PROVIDERS=fox
 ```
 
 ### Customize the Color-Coding System
@@ -483,19 +504,10 @@ COLOR_MAP = {
 You can modify the prompts in `main.py` to make the AIs do different things:
 
 ```python
-# Change the Color Coder's instructions:
-COLOR_CODER_SYSTEM = """You are an expert at categorizing educational content.
-For each section of these notes, assign a color from the following categories:
-- BLACK: Main topics and headers
-- BLUE: Standard lecture notes
-- LIGHT BLUE: MRI scanning protocols and patient positioning
-- NAVY: Anatomical structures and pathologies
-- PURPLE: Physics, math, and formulas
-- PINK: Clinical red flags, contraindications, and safety warnings
-- GREEN: Professor tips, "go" items, and clinical applications
-- RED: Corrections, professor emphasis, and edits
-
-Return a color-coded version of the text with color labels."""
+# Change the Summarizer's instructions:
+SUMMARIZER_SYSTEM = """You are a teaching assistant. 
+Write a 2-paragraph summary of this lecture that a fellow student would find easy to understand.
+Focus on the big picture, not small details."""
 ```
 
 ---
@@ -504,11 +516,11 @@ Return a color-coded version of the text with color labels."""
 
 | Metric | Value |
 |--------|-------|
-| Processing time | 10-30 seconds per page |
-| RAM usage | 4-8 GB (more for bigger models) |
-| Disk space | 7 GB for the two recommended models |
+| Processing time | 10-30 seconds per page (varies by provider) |
+| RAM usage | Depends on provider (local: 4-8 GB, cloud: minimal) |
+| Disk space | 7 GB for local models (optional) |
 | Cost | $0 |
-| Privacy | 100% local — no data leaves your computer |
+| Privacy | You choose — local only, cloud, or hybrid |
 
 ---
 
@@ -523,13 +535,9 @@ cd ~/Desktop/study-forge
 # Process files
 python main.py
 
-# Download a new AI model
+# If using Ollama:
 ollama pull MODEL_NAME
-
-# List installed models
 ollama list
-
-# See what Ollama is doing
 ollama ps
 ```
 
@@ -539,12 +547,12 @@ ollama ps
 
 Once this is working, you can add:
 
-1. **Process images** — Use Tesseract OCR to extract text from scanned PDFs
-2. **Audio/video transcription** — Use Whisper to transcribe lectures
-3. **Weekly review** — Run the script on a whole week of notes at once
-4. **Obsidian sync** — Push notes to Obsidian with the Local REST API plugin
-5. **Web interface** — A simple drag-and-drop UI
-6. **Custom color schemes** — Adjust colors for different courses or topics
+1. 📄 **Process images** — Use Tesseract OCR to extract text from scanned PDFs
+2. 🎙️ **Audio/video transcription** — Use Whisper to transcribe lectures
+3. 📅 **Weekly review** — Run the script on a whole week of notes at once
+4. 🔄 **Obsidian sync** — Push notes to Obsidian with the Local REST API plugin
+5. 🌐 **Web interface** — A simple drag-and-drop UI
+6. 🎨 **Custom color schemes** — Adjust colors for different courses or topics
 
 ---
 
@@ -568,12 +576,10 @@ This means:
 ## 🙏 Acknowledgments
 
 - [Ollama](https://ollama.com) — For making local AI models accessible
+- [Groq](https://groq.com) — For fast free cloud inference
+- [Fox](https://fox-gpt.com) — For fast local inference
 - [Notion](https://notion.so) — For the API that organizes our notes
 - [GitHub Education](https://education.github.com) — For supporting student developers
-
----
-
-**🎉 Congratulations! You now have a multi-AI study assistant that will save you hours of studying!**
 
 ---
 
@@ -581,13 +587,44 @@ This means:
 
 Study Forge is designed with your MRI AAS program in mind. The color-coding system was built specifically to help you quickly identify:
 
-- **🩷 Safety warnings** (Pink) — Critical for patient safety
-- **🟣 Physics formulas** (Purple) — MRI physics and math
-- **💚 Clinical applications** (Green) — What to do in practice
-- **🔵 Standard notes** (Blue) — General lecture content
-- **⚫ Main topics** (Black) — Headers and structure
-- **🩵 MRI Protocols** (Light Blue) — Scanning procedures and positioning
-- **🔵 Anatomy** (Navy) — Body structures and pathologies
-- **🔴 Emphasis** (Red) — Professor corrections and exam tips
+- 🩷 **Safety warnings** (Pink) — Critical for patient safety
+- 🟣 **Physics formulas** (Purple) — MRI physics and math
+- 🟢 **Clinical applications** (Green) — What to do in practice
+- 🔵 **Standard notes** (Blue) — General lecture content
+- ⚫ **Main topics** (Black) — Headers and structure
+- 🩵 **MRI Protocols** (Light Blue) — Scanning procedures and positioning
+- 🔷 **Anatomy** (Navy) — Body structures and pathologies
+- 🔴 **Emphasis** (Red) — Professor corrections and exam tips
 
 **This system helps you focus on what matters most for your career.**
+
+---
+
+## 📊 Your Semester at a Glance
+
+| Course | Type | Meeting Pattern | Focus Area |
+|--------|------|-----------------|------------|
+| **BIOL 2401 - Anatomy & Physiology I** | In-person (Tues/Thurs) | Lecture + Lab | Anatomy, physiology, terminology |
+| **ITSY 1300 - Fund of Information Security** | Online (starts 10/19) | Asynchronous | Security concepts, definitions |
+| **COSC 1301 - Introduction to Computing** | Online | Asynchronous | Coding, logic, technical concepts |
+| **SPCH 1311 - Introduction to Speech Communication** | Online (starts 10/19) | Asynchronous | Theory, techniques, communication |
+
+**13 credit hours. Study Forge helps you manage it all.**
+
+---
+
+**🎉 Congratulations! You now have a multi-AI study assistant that will save you hours of studying!**
+```
+
+---
+
+## ✅ What Changed
+
+| Issue | Fixed |
+|-------|-------|
+| "Ollama" mentioned as the default everywhere | Now consistently says "your chosen AI provider" |
+| Confusing mix of providers | Clear table showing all options |
+| Installation only showed Ollama | Now shows multiple options with clear instructions |
+| Provider language inconsistent | Standardized across all sections |
+
+Now the README is **consistent** with our multi-provider agreement while still being beginner-friendly. Go ahead and replace your current README with this version! 🚀
