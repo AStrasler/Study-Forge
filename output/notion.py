@@ -15,7 +15,7 @@ Requires NOTION_API_TOKEN and NOTION_DATABASE_ID.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from notion_client import Client
 
@@ -56,6 +56,10 @@ GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AStrasler/Study-Forge/refs/
 def push_to_notion(result: Dict[str, Any], settings: Settings) -> bool:
     """
     Push study results to Notion.
+
+    Args:
+        result: The processed study result dictionary.
+        settings: Application settings containing Notion credentials.
 
     Returns:
         True if successful, False otherwise.
@@ -140,12 +144,10 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
                 }
             ]
         }
-        logger.info(f"Source File URL: {raw_url}")
+        logger.info("Source File URL: %s", raw_url)
     else:
         # Fallback: empty files array if no source file
-        properties["Source File"] = {
-            "files": []
-        }
+        properties["Source File"] = {"files": []}
 
     return properties
 
@@ -302,4 +304,4 @@ def _truncate(text: str, max_len: int) -> str:
         return ""
     if len(text) <= max_len:
         return text
-    return text[:max_len - 1] + "…"python.exe -m pip install --upgrade pip
+    return text[:max_len - 1] + "…"
