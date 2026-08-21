@@ -25,6 +25,7 @@ class Settings:
 
     # Cloud BYOK (optional)
     groq_api_key: Optional[str] = None
+    groq_model: str = "openai/gpt-oss-20b"
     cloudflare_api_token: Optional[str] = None
     cloudflare_account_id: Optional[str] = None
     gemini_api_key: Optional[str] = None
@@ -63,6 +64,7 @@ class Settings:
             local_model=os.getenv("LOCAL_MODEL", "llama3.2").strip(),
             ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
             groq_api_key=os.getenv("GROQ_API_KEY") or None,
+            groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip(),
             cloudflare_api_token=os.getenv("CLOUDFLARE_API_TOKEN") or None,
             cloudflare_account_id=os.getenv("CLOUDFLARE_ACCOUNT_ID") or None,
             gemini_api_key=os.getenv("GEMINI_API_KEY") or None,

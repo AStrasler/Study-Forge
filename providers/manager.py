@@ -11,6 +11,7 @@ from config.settings import Settings
 from utils.logging import get_logger
 
 from .base import BaseProvider, ProviderError, ProviderResponse
+from .groq import GroqProvider
 from .ollama import OllamaProvider
 
 logger = get_logger(__name__)
@@ -32,8 +33,15 @@ class ProviderManager:
             )
         # Future: fox, mullama
 
-        # Cloud stubs will be added later (Groq, Cloudflare, Gemini, HF)
-        # They remain disabled until credentials and implementations exist.
+        # Cloud — only register when credentials exist
+        if self.settings.groq_api_key:
+            self._providers["groq"] = GroqProvider(
+                api_key=self.settings.groq_api_key,
+                model=self.settings.groq_model,
+                timeout=min(self.settings.provider_timeout, 120),
+            )
+
+        # Future: cloudflare, gemini, huggingface
 
     def get_ordered_providers(self) -> List[BaseProvider]:
         ordered: List[BaseProvider] = []
@@ -49,8 +57,15 @@ class ProviderManager:
         Only real provider failures trigger the next fallback.
         """
         last_error: Optional[Exception] = None
+        ordered = self.get_ordered_providers()
 
-        for provider in self.get_ordered_providers():
+        if not ordered:
+            raise ProviderError(
+                "No providers configured. Set LOCAL_PROVIDER/Ollama or a cloud API key.",
+                provider="manager",
+            )
+
+        for provider in ordered:
             if not provider.is_available():
                 logger.warning("Provider %s is not available — skipping", provider.name)
                 continue
