@@ -110,7 +110,14 @@ def push_to_notion(result: Dict[str, Any], settings: Settings) -> bool:
 
 
 def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str, Any]:
-    """Build Notion page properties with correct types."""
+    """
+    Build Notion page properties with correct types.
+
+    The database columns must be:
+    - Name (Title)
+    - Source File (Files & media)
+    - Processing Date (Date)
+    """
     properties = {
         "Name": {
             "title": [{"text": {"content": _truncate(title, 2000)}}]
@@ -120,10 +127,9 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
         },
     }
 
-    # Source File — use GitHub raw URL if available
+    # Source File — use GitHub raw URL as a file attachment
     source_file = result.get("source_file", "")
     if source_file:
-        # Construct GitHub raw URL
         raw_url = f"{GITHUB_RAW_BASE}{source_file}"
         properties["Source File"] = {
             "files": [
@@ -136,9 +142,9 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
         }
         logger.info(f"Source File URL: {raw_url}")
     else:
-        # Fallback: empty text if no source file
+        # Fallback: empty files array if no source file
         properties["Source File"] = {
-            "rich_text": [{"text": {"content": ""}}]
+            "files": []
         }
 
     return properties
@@ -296,4 +302,4 @@ def _truncate(text: str, max_len: int) -> str:
         return ""
     if len(text) <= max_len:
         return text
-    return text[:max_len - 1] + "…"
+    return text[:max_len - 1] + "…"python.exe -m pip install --upgrade pip
