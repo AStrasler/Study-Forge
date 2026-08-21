@@ -618,17 +618,19 @@ Study Forge is designed with your MRI AAS program in mind. The color-coding syst
 **This system helps you focus on what matters most for your career.**
 
 ---
-📊 Example Semester Overview
+## 📊 Example Semester Overview
+
 Here's how Study Forge helps organize a typical student's courses:
 
-Course	Type	Focus Area
-BIOL 101 - Introduction to Biology	In-person (Tues/Thurs)	Cellular biology, genetics, terminology
-CSCI 101 - Programming Fundamentals	Online	Python basics, logic, algorithms
-ENG 201 - College Writing	Online	Essay structure, rhetoric, research
-PSYC 101 - General Psychology	In-person (Mon/Wed)	Human behavior, theories, terminology
-13 credit hours. Study Forge helps you manage it all.
+| 📚 Course | 🏫 Type | 🎯 Focus Area |
+| :--- | :--- | :--- |
+| 🧬 **BIOL 101 - Introduction to Biology** | 📍 In-person (Tues/Thurs) | 🧫 Cellular biology, genetics, terminology |
+| 💻 **CSCI 101 - Programming Fundamentals** | 🌐 Online | 🐍 Python basics, logic, algorithms |
+| ✍️ **ENG 201 - College Writing** | 🌐 Online | 📝 Essay structure, rhetoric, research |
+| 🧠 **PSYC 101 - General Psychology** | 📍 In-person (Mon/Wed) | 🧩 Human behavior, theories, terminology |
+
+**13 credit hours. Study Forge helps you manage it all.** 🎓🚀
 
 ---
 
 **🎉 Congratulations! You now have a multi-AI study assistant that will save you hours of studying!**
-```
