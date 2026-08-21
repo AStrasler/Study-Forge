@@ -3,12 +3,18 @@ Notion output adapter.
 
 Pushes structured study results into a user-owned Notion database.
 Requires NOTION_API_TOKEN and NOTION_DATABASE_ID.
+
+- Creates the page first, then appends children in batches of ≤90
+  so content is never silently truncated at the 100-block API limit.
+- Applies the closest supported Notion text/block color for each
+  semantic classification. Original hex + category are preserved
+  in structured data and shown as labels where useful.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from notion_client import Client
 
@@ -16,6 +22,22 @@ from config.settings import Settings
 from utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+# Notion supports a fixed set of annotation/block colors — not arbitrary hex.
+# Map project semantic hex → closest supported Notion color.
+# Documented limitation: exact hex cannot be reproduced in Notion's API.
+HEX_TO_NOTION_COLOR: Dict[str, str] = {
+    "#000000": "default",       # Main Topics / Headers
+    "#0000FF": "blue",          # Standard Notes
+    "#ADD8E6": "blue_background",  # Scanning Protocols / Positioning
+    "#000080": "blue",          # Anatomical Structures / Pathologies
+    "#800080": "purple",        # Physics / Math / Formulas
+    "#FF69B4": "pink",          # Clinical Red Flags / Safety
+    "#008000": "green",         # Professor Tips / Clinical Application
+    "#FF0000": "red",           # Corrections / Professor Emphasis
+}
+
+BATCH_SIZE = 90  # stay under Notion's 100-children-per-request limit
 
 
 def push_to_notion(result: Dict[str, Any], settings: Settings) -> None:
@@ -27,49 +49,178 @@ def push_to_notion(result: Dict[str, Any], settings: Settings) -> None:
     title = result.get("source_file", "Untitled Study Note")
     now = datetime.now(timezone.utc).isoformat()
 
-    # Minimal property set. Schema can be refined once the database is created.
     properties = {
-        "Name": {"title": [{"text": {"content": title}}]},
-        "Source File": {"rich_text": [{"text": {"content": result.get("source_file", "")}}]},
+        "Name": {"title": [{"text": {"content": _truncate(title, 2000)}}]},
+        "Source File": {
+            "rich_text": [{"text": {"content": _truncate(result.get("source_file", ""), 2000)}}]
+        },
         "Processing Date": {"date": {"start": now}},
     }
 
-    # Page body as simple paragraphs for now
-    children = []
+    children = _build_blocks(result)
+
+    # Create page with first batch (or empty if no children yet)
+    first_batch = children[:BATCH_SIZE]
+    remaining = children[BATCH_SIZE:]
+
+    page = client.pages.create(
+        parent={"database_id": settings.notion_database_id},
+        properties=properties,
+        children=first_batch,
+    )
+    page_id = page["id"]
+    logger.info("Created Notion page %s for %s", page_id, title)
+
+    # Append remaining batches
+    offset = 0
+    while offset < len(remaining):
+        batch = remaining[offset : offset + BATCH_SIZE]
+        client.blocks.children.append(block_id=page_id, children=batch)
+        offset += BATCH_SIZE
+        logger.info(
+            "Appended blocks %d–%d to page %s",
+            BATCH_SIZE + offset - len(batch) + 1,
+            BATCH_SIZE + offset,
+            page_id,
+        )
+
+    total = len(children)
+    logger.info("Pushed to Notion: %s (%d blocks)", title, total)
+
+
+def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
+    blocks: List[Dict[str, Any]] = []
+
+    # Standard sections (plain text body)
     for heading, key in [
         ("Summary", "summary"),
         ("Key Points", "key_points"),
         ("Definitions", "definitions"),
         ("Flashcards", "flashcards"),
-        ("Color-Coded Notes", "color_coded"),
+        ("Synthesized Notes", "synthesized"),
     ]:
         content = result.get(key) or ""
         if not content:
             continue
-        children.append(
-            {
-                "object": "block",
-                "type": "heading_2",
-                "heading_2": {"rich_text": [{"type": "text", "text": {"content": heading}}]},
-            }
-        )
-        # Split long text into manageable paragraph blocks
+        blocks.append(_heading2(heading))
         for chunk in _chunk_text(content, 1800):
-            children.append(
+            blocks.append(_paragraph(chunk))
+
+    # Color-coded segments with Notion colors
+    segments = result.get("color_segments") or []
+    if segments:
+        blocks.append(_heading2("Color-Coded Notes"))
+        # Legend
+        blocks.append(
+            _paragraph(
+                "Semantic colors mapped to nearest Notion-supported colors. "
+                "Original project hex values are preserved in labels.",
+                color="gray",
+            )
+        )
+        for seg in segments:
+            hex_color = (seg.get("color") or "#0000FF").upper()
+            if not hex_color.startswith("#"):
+                hex_color = f"#{hex_color}"
+            category = seg.get("category") or "Standard Notes"
+            text = seg.get("text") or ""
+            notion_color = HEX_TO_NOTION_COLOR.get(hex_color, "default")
+
+            label = f"[{hex_color} · {category}] "
+            # Label in gray, body in mapped color
+            blocks.append(
                 {
                     "object": "block",
                     "type": "paragraph",
-                    "paragraph": {"rich_text": [{"type": "text", "text": {"content": chunk}}]},
+                    "paragraph": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {"content": _truncate(label, 500)},
+                                "annotations": {
+                                    "bold": True,
+                                    "italic": False,
+                                    "strikethrough": False,
+                                    "underline": False,
+                                    "code": False,
+                                    "color": "gray",
+                                },
+                            },
+                            {
+                                "type": "text",
+                                "text": {"content": _truncate(text, 1900)},
+                                "annotations": {
+                                    "bold": False,
+                                    "italic": False,
+                                    "strikethrough": False,
+                                    "underline": False,
+                                    "code": False,
+                                    "color": notion_color
+                                    if not notion_color.endswith("_background")
+                                    else "default",
+                                },
+                            },
+                        ],
+                        "color": notion_color
+                        if notion_color.endswith("_background")
+                        else "default",
+                    },
                 }
             )
+    elif result.get("color_coded_raw"):
+        # Fallback if structured segments missing
+        blocks.append(_heading2("Color-Coded Notes"))
+        for chunk in _chunk_text(result["color_coded_raw"], 1800):
+            blocks.append(_paragraph(chunk))
 
-    client.pages.create(
-        parent={"database_id": settings.notion_database_id},
-        properties=properties,
-        children=children[:100],  # Notion has limits on children per request
-    )
-    logger.info("Pushed to Notion: %s", title)
+    return blocks
 
 
-def _chunk_text(text: str, size: int) -> list[str]:
-    return [text[i : i + size] for i in range(0, len(text), size)] or [""]
+def _heading2(text: str) -> Dict[str, Any]:
+    return {
+        "object": "block",
+        "type": "heading_2",
+        "heading_2": {
+            "rich_text": [{"type": "text", "text": {"content": _truncate(text, 2000)}}],
+            "color": "default",
+        },
+    }
+
+
+def _paragraph(text: str, color: str = "default") -> Dict[str, Any]:
+    return {
+        "object": "block",
+        "type": "paragraph",
+        "paragraph": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {"content": _truncate(text, 2000)},
+                    "annotations": {
+                        "bold": False,
+                        "italic": False,
+                        "strikethrough": False,
+                        "underline": False,
+                        "code": False,
+                        "color": color if color in {
+                            "default", "gray", "brown", "orange", "yellow",
+                            "green", "blue", "purple", "pink", "red",
+                        } else "default",
+                    },
+                }
+            ],
+            "color": "default",
+        },
+    }
+
+
+def _chunk_text(text: str, size: int) -> List[str]:
+    if not text:
+        return []
+    return [text[i : i + size] for i in range(0, len(text), size)]
+
+
+def _truncate(text: str, max_len: int) -> str:
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 1] + "…"

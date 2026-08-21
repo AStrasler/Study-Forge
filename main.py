@@ -33,6 +33,18 @@ def main() -> int:
     try:
         results = process_input_folder(settings)
         logger.info("Processing finished. Files handled: %d", len(results))
+
+        for r in results:
+            if r.get("error"):
+                logger.error("  %s → ERROR: %s", r.get("source_file"), r.get("error"))
+            else:
+                logger.info(
+                    "  %s → local=%s notion=%s",
+                    r.get("source_file"),
+                    r.get("local_result_path"),
+                    r.get("notion_pushed"),
+                )
+
         return 0
     except KeyboardInterrupt:
         logger.warning("Interrupted by user")
