@@ -9,7 +9,7 @@ Requires NOTION_API_TOKEN and NOTION_DATABASE_ID.
 - Applies the closest supported Notion text/block color for each
   semantic classification. Original hex + category are preserved
   in structured data and shown as labels where useful.
-- Source File property uses GitHub raw URL if the file is in the repo.
+- Source Files property uses GitHub raw URL if the file is in the repo.
 """
 
 from __future__ import annotations
@@ -119,7 +119,7 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
 
     The database columns must be:
     - Name (Title)
-    - Source File (Files & media)
+    - Source Files (Files & media)   <-- NOTE: plural "Files"
     - Processing Date (Date)
     """
     properties = {
@@ -131,11 +131,11 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
         },
     }
 
-    # Source File — use GitHub raw URL as a file attachment
+    # Source Files — use GitHub raw URL as a file attachment
     source_file = result.get("source_file", "")
     if source_file:
         raw_url = f"{GITHUB_RAW_BASE}{source_file}"
-        properties["Source File"] = {
+        properties["Source Files"] = {
             "files": [
                 {
                     "name": source_file,
@@ -144,10 +144,10 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
                 }
             ]
         }
-        logger.info("Source File URL: %s", raw_url)
+        logger.info("Source Files URL: %s", raw_url)
     else:
         # Fallback: empty files array if no source file
-        properties["Source File"] = {"files": []}
+        properties["Source Files"] = {"files": []}
 
     return properties
 
