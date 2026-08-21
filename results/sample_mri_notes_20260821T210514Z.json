@@ -1,0 +1,91 @@
+{
+  "source_file": "sample_mri_notes.txt",
+  "summary": "The MRI Safety Lecture Notes summarize the key safety points for the MRI suite. The main topics covered are:\n\n1. **Static Magnetic Field Hazards**: The lecture notes emphasize the importance of avoiding exposure to the static magnetic field, which can cause harm to patients.\n2. **Gradient Field Risks**: The risks associated with the gradient fields used in MRI are also highlighted, although the specific details are not provided.\n3. **RF Heating and SAR**: The lecture notes mention the risks of radiofrequency (RF) heating and the SAR (Strength Assessed Ratio) limits that protect against tissue heating.\n4. **Contraindications for Implants**: The lecture notes note that patients with certain implants, such as pacemakers, should not be scanned in the MRI suite due to the risks associated with the magnetic field.\n\nThe key safety points emphasized in the lecture notes are:\n\n- Patients with pacemakers should not enter the MRI suite.\n- Ferromagnetic objects can become projectiles in the magnetic field.\n- SAR limits protect against tissue heating.\n- It is essential to verify implant compatibility before scanning.\n\nOverall, the lecture notes emphasize the importance of safety protocols in the MRI suite, including verifying implant compatibility before scanning.",
+  "key_points": "Here are 5-8 clear, non-redundant key points from the study material:\n\n1. Patients with pacemakers should not enter the MRI suite.\n2. Ferromagnetic objects can become projectiles in the magnetic field.\n3. SAR (Superior Radiation Alert) limits protect against tissue heating.\n4. MRI safety personnel must verify implant compatibility before scanning.\n5. The magnetic field can heat up tissues if ferromagnetic objects are present.\n6. The magnetic field can also cause projectiles to become generated from ferromagnetic objects.\n7. SAR limits apply to all patients, not just those with implants.\n8. MRI safety personnel must follow established protocols to ensure patient safety.",
+  "flashcards": "Here are the flashcards based on the provided material:\n\n**Q: What is the primary hazard of static magnetic fields in MRI?**\nA: Patients with certain pacemakers must not enter the MRI suite due to the risk of magnetic interference.\n\n**Q: What is the risk of when ferromagnetic objects are placed in a magnetic field?**\nA: Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and personnel.\n\n**Q: What is the purpose of SAR limits in MRI?**\nA: SAR (Salting and Relieving) limits protect against tissue heating by limiting the exposure to radiofrequency energy.\n\n**Q: Why is it essential to verify implant compatibility before MRI scanning?**\nA: Always verify implant compatibility before scanning to ensure the safety of patients with implants, including pacemakers.\n\n**Q: What is the contraindication for MRI scans of patients with certain implants?**\nA: Patients with certain pacemakers must not enter the MRI suite due to the risk of magnetic interference.",
+  "definitions": "Here are the key terms and their definitions extracted from the study material:\n\n- **Static Magnetic Field Hazards**: The potential for magnetic fields to cause electrical shocks or disruptions to medical equipment.\n- **Gradient Field Risks**: The potential for gradient fields to cause electromagnetic interference or disrupt medical equipment.\n- **RF Heating and SAR (Stress Radiation)**: The potential for radiofrequency (RF) energy to cause heating effects on the body, particularly in sensitive areas such as the brain.\n- **Contraindications for Implants**: Medical implants that are not suitable for use in the presence of a strong magnetic field, such as pacemakers.\n\nLet me know if you'd like me to help with anything else.",
+  "synthesized": "Here's the synthesized study result:\n\n**MRI Safety Lecture Notes Summary**\n\nThe MRI Safety Lecture Notes emphasize the importance of safety protocols in the MRI suite. Key points include:\n\n* Patients with pacemakers should not enter the MRI suite due to the risk of magnetic interference.\n* Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and personnel.\n* SAR (Superior Radiation Alert) limits protect against tissue heating by limiting the exposure to radiofrequency energy.\n* MRI safety personnel must verify implant compatibility before scanning to ensure patient safety.\n\n**Key Safety Points**\n\nPatients with pacemakers, ferromagnetic objects, and certain implants should be screened for compatibility before MRI scanning. Ferromagnetic objects can become projectiles in the magnetic field, and SAR limits apply to all patients, not just those with implants. It is essential to follow established protocols to ensure patient safety.\n\n**Flashcards**\n\n* Q: What is the primary hazard of static magnetic fields in MRI?\nA: Patients with certain pacemakers must not enter the MRI suite due to magnetic interference.\n* Q: What is the risk of when ferromagnetic objects are placed in a magnetic field?\nA: Ferromagnetic objects can become projectiles in the magnetic field.\n* Q: What is the purpose of SAR limits in MRI?\nA: SAR limits protect against tissue heating by limiting the exposure to radiofrequency energy.\n* Q: Why is it essential to verify implant compatibility before MRI scanning?\nA: Always verify implant compatibility before scanning to ensure patient safety.\n\n**Definitions**\n\n* **Static Magnetic Field Hazards**: Potential for magnetic fields to cause electrical shocks or disruptions to medical equipment.\n* **Gradient Field Risks**: Potential for gradient fields to cause electromagnetic interference or disrupt medical equipment.\n* **RF Heating and SAR (Stress Radiation)**: Potential for radiofrequency (RF) energy to cause heating effects on the body, particularly in sensitive areas such as the brain.\n* **Contraindications for Implants**: Medical implants that are not suitable for use in the presence of a strong magnetic field, such as pacemakers.",
+  "color_coded_raw": "[\n  {\n    \"text\": \"Patients with pacemakers should not enter the MRI suite due to the risk of magnetic interference.\",\n    \"color\": \"#0000FF\",\n    \"category\": \"Standard Notes\"\n  },\n  {\n    \"text\": \"Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and personnel.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"SAR (Superior Radiation Alert) limits protect against tissue heating by limiting the exposure to radiofrequency energy.\",\n    \"color\": \"#008000\",\n    \"category\": \"Physics / Math / Formulas\"\n  },\n  {\n    \"text\": \"MRI safety personnel must verify implant compatibility before scanning to ensure patient safety.\",\n    \"color\": \"#800080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"Patients with pacemakers, ferromagnetic objects, and certain implants should be screened for compatibility before MRI scanning.\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Professor Tips / Clinical Application\"\n  },\n  {\n    \"text\": \"Ferromagnetic objects can become projectiles in the magnetic field, and SAR limits apply to all patients, not just those with implants.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Flashcards\"\n  },\n  {\n    \"text\": \"Q: What is the primary hazard of static magnetic fields in MRI?\",\n    \"color\": \"#0000FF\",\n    \"category\": \"Flashcards\"\n  },\n  {\n    \"text\": \"Q: What is the risk of when ferromagnetic objects are placed in a magnetic field?\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Flashcards\"\n  },\n  {\n    \"text\": \"Q: What is the purpose of SAR limits in MRI?\",\n    \"color\": \"#008000\",\n    \"category\": \"Flashcards\"\n  },\n  {\n    \"text\": \"Q: Why is it essential to verify implant compatibility before MRI scanning?\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Flashcards\"\n  },\n  {\n    \"text\": \"Definitions.\",\n    \"color\": \"#0000FF\",\n    \"category\": \"Definitions\"\n  },\n  {\n    \"text\": \"Static Magnetic Field Hazards.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Definitions\"\n  },\n  {\n    \"text\": \"Gradient Field Risks.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Definitions\"\n  },\n  {\n    \"text\": \"RF Heating and SAR (Stress Radiation).\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Definitions\"\n  },\n  {\n    \"text\": \"Contraindications for Implants.\",\n    \"color\": \"#008000\",\n    \"category\": \"Definitions\"\n  }\n]",
+  "color_segments": [
+    {
+      "text": "Patients with pacemakers should not enter the MRI suite due to the risk of magnetic interference.",
+      "color": "#0000FF",
+      "category": "Standard Notes"
+    },
+    {
+      "text": "Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and personnel.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "SAR (Superior Radiation Alert) limits protect against tissue heating by limiting the exposure to radiofrequency energy.",
+      "color": "#008000",
+      "category": "Professor Tips / Clinical Application"
+    },
+    {
+      "text": "MRI safety personnel must verify implant compatibility before scanning to ensure patient safety.",
+      "color": "#800080",
+      "category": "Physics / Math / Formulas"
+    },
+    {
+      "text": "Patients with pacemakers, ferromagnetic objects, and certain implants should be screened for compatibility before MRI scanning.",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "Ferromagnetic objects can become projectiles in the magnetic field, and SAR limits apply to all patients, not just those with implants.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What is the primary hazard of static magnetic fields in MRI?",
+      "color": "#0000FF",
+      "category": "Standard Notes"
+    },
+    {
+      "text": "Q: What is the risk of when ferromagnetic objects are placed in a magnetic field?",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What is the purpose of SAR limits in MRI?",
+      "color": "#008000",
+      "category": "Professor Tips / Clinical Application"
+    },
+    {
+      "text": "Q: Why is it essential to verify implant compatibility before MRI scanning?",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "Definitions.",
+      "color": "#0000FF",
+      "category": "Standard Notes"
+    },
+    {
+      "text": "Static Magnetic Field Hazards.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Gradient Field Risks.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "RF Heating and SAR (Stress Radiation).",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Contraindications for Implants.",
+      "color": "#008000",
+      "category": "Professor Tips / Clinical Application"
+    }
+  ],
+  "provider_used": "ollama",
+  "processed_at": "2026-08-21T21:05:13.656197+00:00",
+  "local_result_path": "results\\sample_mri_notes_20260821T210513Z.json",
+  "notion_pushed": false,
+  "notion_error": "Source File is expected to be files."
+}
