@@ -40,8 +40,10 @@ class Settings:
     notion_database_id: Optional[str] = None
 
     # Paths & runtime
+    # NOTE: results go to ./results — not ./output — to avoid colliding with the
+    # Python package directory named "output/".
     input_folder: str = "./input"
-    output_folder: str = "./output"
+    output_folder: str = "./results"
     provider_timeout: int = 120
     log_level: str = "INFO"
 
@@ -68,7 +70,7 @@ class Settings:
             notion_api_token=os.getenv("NOTION_API_TOKEN") or None,
             notion_database_id=os.getenv("NOTION_DATABASE_ID") or None,
             input_folder=os.getenv("INPUT_FOLDER", "./input"),
-            output_folder=os.getenv("OUTPUT_FOLDER", "./output"),
+            output_folder=os.getenv("OUTPUT_FOLDER", "./results"),
             provider_timeout=int(os.getenv("PROVIDER_TIMEOUT", "120")),
             log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
         )
