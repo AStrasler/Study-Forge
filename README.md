@@ -1,12 +1,3 @@
-You got it! Here's the **final, fully consistent README** with:
-1. The clean workflow diagram (that actually renders)
-2. **No "Ollama-only" language** — everything says "your chosen AI provider"
-3. Bulleted lists instead of broken tables
-4. Emojis throughout for fun readability
-
----
-
-```markdown
 # 🔨 Study Forge
 
 > ⚡ Transform your lecture materials (PDFs, PowerPoints, Word docs) into organized, **color-coded** study notes using a team of AI assistants working together.
