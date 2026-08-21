@@ -44,7 +44,8 @@ class Settings:
     # Python package directory named "output/".
     input_folder: str = "./input"
     output_folder: str = "./results"
-    provider_timeout: int = 120
+    # Local CPU inference (Judge especially) often needs >120s
+    provider_timeout: int = 300
     log_level: str = "INFO"
 
     @classmethod
@@ -71,6 +72,6 @@ class Settings:
             notion_database_id=os.getenv("NOTION_DATABASE_ID") or None,
             input_folder=os.getenv("INPUT_FOLDER", "./input"),
             output_folder=os.getenv("OUTPUT_FOLDER", "./results"),
-            provider_timeout=int(os.getenv("PROVIDER_TIMEOUT", "120")),
+            provider_timeout=int(os.getenv("PROVIDER_TIMEOUT", "300")),
             log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
         )

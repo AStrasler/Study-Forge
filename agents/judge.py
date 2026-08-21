@@ -22,7 +22,10 @@ SYSTEM = (
     "- remove weak or redundant information\n"
     "- reconcile differences\n"
     "- produce one coherent, high-quality final study package.\n"
-    "Do not simply concatenate the inputs. Synthesize."
+    "Do not simply concatenate the inputs. Synthesize.\n"
+    "Keep the final package compact and well-structured "
+    "(brief summary, key points, essential definitions, a few flashcards). "
+    "Avoid long repetition."
 )
 
 
@@ -33,7 +36,8 @@ def run(agent_outputs: Dict[str, str], manager: ProviderManager) -> ProviderResp
     combined = "\n\n".join(sections)
 
     prompt = (
-        "Synthesize the following agent outputs into a single coherent study result.\n\n"
+        "Synthesize the following agent outputs into a single coherent study result. "
+        "Be concise.\n\n"
         f"{combined}"
     )
     return manager.generate(prompt, system=SYSTEM)
