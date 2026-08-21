@@ -1,0 +1,14 @@
+﻿MRI Safety Lecture Notes
+
+Main topics:
+- Static magnetic field hazards
+- Gradient field risks
+- RF heating and SAR
+- Contraindications for implants
+
+Key safety points:
+Patients with certain pacemakers must not enter the MRI suite.
+Ferromagnetic objects can become projectiles in the magnetic field.
+SAR limits protect against tissue heating.
+
+Professor tip: Always verify implant compatibility before scanning.
