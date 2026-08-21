@@ -81,26 +81,26 @@ This system uses a team of specialized AIs that collaborate. You choose which AI
 - 🎨 **Color Coder** — Assigns color codes based on content type
 - ⚖️ **Judge** — Reviews all outputs and creates the final version
 
-### How They Work Together
+What Each Step Does
+Step 1: You drop any file (PDF, PowerPoint, Word, or text) into the uploads folder
 
-```
-1. 📄 Your File (PDF, DOCX, PPT)
-         ↓
-2. 📖 Text Extracted
-         ↓
-    ┌────┴────┐
-    ↓         ↓        
-3. 📝Summarizer
-4. 📌Key Points
-5. 🃏Flashcards
-    ↓         ↓         
-    └────┬────┘
-         ↓
-6. ⚖️ Judge AI (Synthesizes)
-         ↓
-7. 🎨 Color Coder (Assigns colors by content type)
-         ↓
-8. 📤 Notion (Organized + Color-Coded)
+Step 2: Study Forge extracts all the text from your file
+
+Step 3: Three AI agents work at the same time:
+
+📝 Summarizer — creates a concise summary
+
+📌 Key Points — extracts the most important takeaways
+
+🃏 Flashcards — generates Q&A pairs for review
+
+Step 4: ⚖️ Judge AI reviews all three outputs and combines the best parts
+
+Step 5: 🎨 Color Coder assigns colors based on content type (MRI protocols, anatomy, physics, safety, etc.)
+
+Step 6: 📤 Notion receives your fully organized, color-coded notes
+
+
 ```
 
 ### What Each Agent Does
