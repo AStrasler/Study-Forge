@@ -9,6 +9,7 @@ Requires NOTION_API_TOKEN and NOTION_DATABASE_ID.
 - Applies the closest supported Notion text/block color for each
   semantic classification. Original hex + category are preserved
   in structured data and shown as labels where useful.
+- Source File property uses GitHub raw URL if the file is in the repo.
 """
 
 from __future__ import annotations
@@ -47,6 +48,9 @@ VALID_NOTION_COLORS = {
     "yellow_background", "green_background", "blue_background",
     "purple_background", "pink_background", "red_background"
 }
+
+# GitHub raw URL base for files in this repository
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AStrasler/Study-Forge/refs/heads/main/input/"
 
 
 def push_to_notion(result: Dict[str, Any], settings: Settings) -> bool:
@@ -116,23 +120,23 @@ def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str,
         },
     }
 
-    # Source File — use files type if the database expects it, otherwise text
-    # Check if we have a file URL to attach; if not, use rich_text
+    # Source File — use GitHub raw URL if available
     source_file = result.get("source_file", "")
     if source_file:
-        # Try to use files type first (if the column is set up that way)
-        # If the user's database has Source File as "Files", this works.
-        # If it's "Text", the user can change it, or we can fall back.
+        # Construct GitHub raw URL
+        raw_url = f"{GITHUB_RAW_BASE}{source_file}"
         properties["Source File"] = {
             "files": [
                 {
                     "name": source_file,
                     "type": "external",
-                    "external": {"url": ""}  # Empty URL means no actual file link
+                    "external": {"url": raw_url}
                 }
             ]
         }
+        logger.info(f"Source File URL: {raw_url}")
     else:
+        # Fallback: empty text if no source file
         properties["Source File"] = {
             "rich_text": [{"text": {"content": ""}}]
         }
