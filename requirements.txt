@@ -1,0 +1,20 @@
+# Study Forge dependencies
+# Keep this list minimal. Add libraries only when they are actually used.
+
+# Configuration
+python-dotenv>=1.0.0
+
+# HTTP clients (used by providers and Notion)
+requests>=2.31.0
+httpx>=0.27.0
+
+# Document extraction (PDF / DOCX / PPTX)
+pypdf>=4.0.0
+python-docx>=1.1.0
+python-pptx>=1.0.0
+
+# Notion client
+notion-client>=2.2.0
+
+# Optional: structured logging / progress (kept light)
+# rich>=13.0.0
