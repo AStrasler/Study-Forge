@@ -1,10 +1,3 @@
-Yes. The README needs one **major conceptual correction** now: **“local-first” no longer means “runs on the student's PC.”** It means **private/local inference is the preferred processing path**, while the **application itself can be web-hosted**.
-
-That distinction needs to be unmistakable, otherwise someone reading the repo will walk away thinking Study Forge is still fundamentally a desktop/local script. Your current README still says things like “runs 100% free on your own computer,” which is now outdated. ([GitHub][1])
-
-I’d replace it with this:
-
-````markdown
 # 🔨 Study Forge
 
 > A local-first, web-accessible study-material processing tool that transforms lecture PDFs, PowerPoints, Word documents, and other study materials into structured, color-coded notes using a team of specialized AI agents.
