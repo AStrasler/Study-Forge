@@ -18,14 +18,27 @@ def _split_csv(value: str) -> List[str]:
 
 @dataclass
 class Settings:
-    # Local
+    # Local providers
     local_provider: str = "ollama"
     local_model: str = "llama3.2"
+
+    # Ollama
     ollama_base_url: str = "http://localhost:11434"
+
+    # Fox (local inference)
+    fox_base_url: str = "http://localhost:8080"
+    fox_model: str = "llama3.2:3b"
+    fox_timeout: int = 300
+
+    # Mullama (in-process inference)
+    mullama_model: str = "llama3.2:3b"
+    mullama_gpu_layers: int = 32
+    mullama_context_size: int = 2048
+    mullama_embedding_model: Optional[str] = None
 
     # Cloud BYOK (optional)
     groq_api_key: Optional[str] = None
-    groq_model: str = "openai/gpt-oss-20b"
+    groq_model: str = "llama-3.3-70b-versatile"
     cloudflare_api_token: Optional[str] = None
     cloudflare_account_id: Optional[str] = None
     gemini_api_key: Optional[str] = None
@@ -33,7 +46,7 @@ class Settings:
 
     # Fallback order
     provider_fallback_order: List[str] = field(
-        default_factory=lambda: ["ollama", "groq", "cloudflare", "gemini", "huggingface"]
+        default_factory=lambda: ["ollama", "fox", "mullama", "groq", "cloudflare", "gemini", "huggingface"]
     )
 
     # Notion
@@ -41,11 +54,8 @@ class Settings:
     notion_database_id: Optional[str] = None
 
     # Paths & runtime
-    # NOTE: results go to ./results — not ./output — to avoid colliding with the
-    # Python package directory named "output/".
     input_folder: str = "./input"
     output_folder: str = "./results"
-    # Local CPU inference (Judge especially) often needs >120s
     provider_timeout: int = 300
     log_level: str = "INFO"
 
@@ -55,16 +65,23 @@ class Settings:
         if env_file:
             load_dotenv(env_file)
         else:
-            load_dotenv()  # looks for .env in cwd and parents
+            load_dotenv()
 
-        order = os.getenv("PROVIDER_FALLBACK_ORDER", "ollama,groq,cloudflare,gemini,huggingface")
+        order = os.getenv("PROVIDER_FALLBACK_ORDER", "ollama,fox,mullama,groq,cloudflare,gemini,huggingface")
 
         return cls(
             local_provider=os.getenv("LOCAL_PROVIDER", "ollama").strip().lower(),
             local_model=os.getenv("LOCAL_MODEL", "llama3.2").strip(),
             ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
+            fox_base_url=os.getenv("FOX_BASE_URL", "http://localhost:8080").rstrip("/"),
+            fox_model=os.getenv("FOX_MODEL", "llama3.2:3b").strip(),
+            fox_timeout=int(os.getenv("FOX_TIMEOUT", "300")),
+            mullama_model=os.getenv("MULLAMA_MODEL", "llama3.2:3b").strip(),
+            mullama_gpu_layers=int(os.getenv("MULLAMA_GPU_LAYERS", "32")),
+            mullama_context_size=int(os.getenv("MULLAMA_CONTEXT_SIZE", "2048")),
+            mullama_embedding_model=os.getenv("MULLAMA_EMBEDDING_MODEL") or None,
             groq_api_key=os.getenv("GROQ_API_KEY") or None,
-            groq_model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b").strip(),
+            groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
             cloudflare_api_token=os.getenv("CLOUDFLARE_API_TOKEN") or None,
             cloudflare_account_id=os.getenv("CLOUDFLARE_ACCOUNT_ID") or None,
             gemini_api_key=os.getenv("GEMINI_API_KEY") or None,
