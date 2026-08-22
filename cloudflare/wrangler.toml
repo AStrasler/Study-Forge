@@ -1,10 +1,13 @@
-# Study Forge — primary web route on Cloudflare: Worker + R2 + D1
-name = "study-forge-api"
+# Study Forge — primary web route (matches existing Worker name)
+name = "study-forge"
 main = "worker.js"
 compatibility_date = "2024-11-01"
 
-# After domain Active, optional:
-# routes = [{ pattern = "api.studyforge.studio/*", zone_name = "studyforge.studio" }]
+# Static UI from repo web/
+[assets]
+directory = "../web"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
 
 [[r2_buckets]]
 binding = "FILES"

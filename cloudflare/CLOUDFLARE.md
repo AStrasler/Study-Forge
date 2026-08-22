@@ -1,23 +1,33 @@
-# Study Forge on Cloudflare (primary web route)
+# Wire upload (R2 + D1)
 
-**Browser → studyforge.studio (Pages UI) → Worker API → R2 (files) + D1 (job rows).**
+## Your tasks
 
-AI stays **private-first** (Ollama / Fox / Mullama on infrastructure you control) or **BYOK** cloud. This Worker does **not** run the multi-agent pipeline by default.
+### 1. Create R2 bucket
+Dashboard → **R2 Object Storage** → **Create bucket** → name: `studyforge`
 
-## Your tasks (simple order)
-
-1. Install Node if needed, then: `npm i -g wrangler`
-2. `wrangler login` (browser opens Cloudflare)
-3. Create R2 bucket named `studyforge` (Dashboard → R2 → Create bucket)
-4. `wrangler d1 create studyforge-db` — copy `database_id` into `cloudflare/wrangler.toml`
-5. `wrangler d1 execute studyforge-db --file=./cloudflare/schema.sql`
-6. `cd cloudflare` → `wrangler deploy`
-7. Pages: create project, upload/connect `web/`, custom domain `studyforge.studio`
-8. After Worker URL exists, in browser console on the site:
-   `localStorage.setItem('sf_api_base', 'https://YOUR-WORKER.workers.dev')`
-
-## Local CLI (still works offline)
-
+### 2. Create D1 database
 ```bash
-python main.py
+npm i -g wrangler
+wrangler login
+wrangler d1 create studyforge-db
 ```
+Copy the printed `database_id` into `cloudflare/wrangler.toml` (replace `REPLACE_AFTER_CREATE`).
+
+### 3. Apply schema
+```bash
+wrangler d1 execute studyforge-db --remote --file=./cloudflare/schema.sql
+```
+
+### 4. Deploy Worker (from repo root or cloudflare/)
+```bash
+cd cloudflare
+wrangler deploy
+```
+
+### 5. Test
+1. Open https://studyforge.studio (pass Cloudflare Access if prompted)
+2. Enter the forge
+3. Upload a small .txt or .pdf
+4. Queue should show the file as **queued**
+
+Upload stores the file in R2 and a row in D1. AI processing still runs via local `python main.py` until wired later.
