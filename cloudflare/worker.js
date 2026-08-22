@@ -1,7 +1,7 @@
 /**
- * Study Forge API Worker (primary web route on Cloudflare)
+ * Study Forge — Cloudflare Worker (primary web/API route)
  * R2: FILES | D1: DB
- * AI stays private-first or BYOK; this Worker handles upload + job metadata.
+ * AI remains private-first or BYOK; this Worker handles upload + job metadata.
  */
 
 const CORS = {
@@ -28,7 +28,12 @@ export default {
 
     try {
       if (path === "/api/health" && request.method === "GET") {
-        return json({ ok: true, service: "study-forge", version: "0.1.0", host: "cloudflare" });
+        return json({
+          ok: true,
+          service: "study-forge",
+          version: "0.1.0",
+          host: "cloudflare",
+        });
       }
 
       if (path === "/api/jobs" && request.method === "GET") {
