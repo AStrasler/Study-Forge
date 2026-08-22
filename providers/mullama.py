@@ -1,184 +1,83 @@
 """
-Mullama provider implementation.
+Mullama local provider (optional).
 
-Mullama runs models directly inside your Python process — no separate
-server, no HTTP calls. Useful for in-process inference and embeddings.
+Uses Mullama's Ollama-compatible HTTP server when running.
+Default base URL: http://localhost:11435 (so it does not collide with Ollama on 11434).
 
-Docs: https://github.com/mullama/mullama
+If Mullama is not installed or not serving, is_available() returns False and
+the manager skips it — no setup required for users who only use Ollama.
+
+Ref: https://github.com/neul-labs/mullama
 """
 
 from __future__ import annotations
 
-import json
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
-from providers.base import BaseProvider, ProviderResponse, ProviderError
-from utils.logging import get_logger
+import httpx
 
-logger = get_logger(__name__)
-
-try:
-    import mullama
-    MULLAMA_AVAILABLE = True
-except ImportError:
-    MULLAMA_AVAILABLE = False
-    logger.warning("Mullama not installed. Run: pip install mullama")
+from .base import BaseProvider, ProviderError, ProviderResponse
 
 
 class MullamaProvider(BaseProvider):
-    """Mullama in-process inference provider."""
+    name = "mullama"
 
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize the Mullama provider.
-
-        Args:
-            config: Configuration dict with keys:
-                - mullama_model: str (default: llama3.2:3b)
-                - mullama_gpu_layers: int (default: 32)
-                - mullama_context_size: int (default: 2048)
-                - mullama_embedding_model: str (optional)
-        """
-        if not MULLAMA_AVAILABLE:
-            raise ImportError(
-                "Mullama is not installed. Run: pip install mullama"
-            )
-
-        self.model_name = config.get("mullama_model", "llama3.2:3b")
-        self.gpu_layers = config.get("mullama_gpu_layers", 32)
-        self.context_size = config.get("mullama_context_size", 2048)
-        self.embedding_model = config.get("mullama_embedding_model")
-        self._model = None
-        self._available = None
-
-    def _load_model(self):
-        """Lazy-load the model when first needed."""
-        if self._model is None:
-            try:
-                self._model = mullama.Model.load(
-                    self.model_name,
-                    n_gpu_layers=self.gpu_layers,
-                )
-                self._available = True
-                logger.info("Mullama loaded model: %s", self.model_name)
-            except Exception as e:
-                self._available = False
-                raise ProviderError(f"Failed to load Mullama model: {e}")
+    def __init__(
+        self,
+        model: str = "llama3.2",
+        base_url: str = "http://localhost:11435",
+        timeout: int = 300,
+    ):
+        self.model = model
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
 
     def is_available(self) -> bool:
-        """Check if Mullama is available and the model can be loaded."""
-        if self._available is not None:
-            return self._available
-
-        if not MULLAMA_AVAILABLE:
-            self._available = False
+        try:
+            with httpx.Client(timeout=3.0) as client:
+                resp = client.get(f"{self.base_url}/api/tags")
+                return resp.status_code == 200
+        except Exception:
             return False
 
-        try:
-            self._load_model()
-            self._available = True
-        except Exception as e:
-            logger.warning("Mullama unavailable: %s", e)
-            self._available = False
-
-        return self._available
-
-    def generate(
-        self,
-        prompt: str,
-        system_prompt: Optional[str] = None,
-        **kwargs
-    ) -> ProviderResponse:
-        """
-        Generate a response using Mullama.
-
-        Args:
-            prompt: The user prompt.
-            system_prompt: Optional system prompt (Mullama may handle differently).
-            **kwargs: Additional generation parameters.
-
-        Returns:
-            ProviderResponse containing the generated text.
-
-        Raises:
-            ProviderError: If generation fails.
-        """
-        if not self.is_available():
-            raise ProviderError("Mullama is not available")
-
-        try:
-            self._load_model()
-
-            # Combine system and user prompt if both provided
-            full_prompt = prompt
-            if system_prompt:
-                full_prompt = f"{system_prompt}\n\n{prompt}"
-
-            # Create context
-            context = mullama.Context(
-                self._model,
-                n_ctx=kwargs.get("context_size", self.context_size),
-            )
-
-            # Generate
-            result = context.generate(
-                full_prompt,
-                max_tokens=kwargs.get("max_tokens", 512),
-                temperature=kwargs.get("temperature", 0.7),
-                top_p=kwargs.get("top_p", 0.9),
-            )
-
-            return ProviderResponse(
-                text=result.strip(),
-                model=self.model_name,
-                provider="mullama",
-                raw_response={"text": result},
-            )
-
-        except Exception as e:
-            raise ProviderError(f"Mullama generation failed: {e}")
-
-    def get_embeddings(self, text: str) -> list[float]:
-        """
-        Generate embeddings using Mullama.
-
-        Requires an embedding model to be configured.
-
-        Args:
-            text: Text to embed.
-
-        Returns:
-            List of float embeddings.
-
-        Raises:
-            ProviderError: If embedding fails or no embedding model is configured.
-        """
-        if not self.embedding_model:
-            raise ProviderError("No embedding model configured for Mullama")
-
-        if not self.is_available():
-            raise ProviderError("Mullama is not available")
-
-        try:
-            self._load_model()
-            # Mullama may use a different method for embeddings
-            # This is a placeholder — adjust based on actual Mullama API
-            raise NotImplementedError(
-                "Mullama embeddings not yet implemented. "
-                "Check mullama documentation for the correct API."
-            )
-        except Exception as e:
-            raise ProviderError(f"Mullama embedding failed: {e}")
-
-    def get_config(self) -> Dict[str, Any]:
-        """Return provider configuration."""
-        return {
-            "provider": "mullama",
-            "model": self.model_name,
-            "gpu_layers": self.gpu_layers,
-            "context_size": self.context_size,
-            "embedding_model": self.embedding_model,
+    def generate(self, prompt: str, *, system: Optional[str] = None, **kwargs: Any) -> ProviderResponse:
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "prompt": prompt,
+            "stream": False,
         }
+        if system:
+            payload["system"] = system
 
-    def __repr__(self) -> str:
-        return f"MullamaProvider(model={self.model_name})"
+        try:
+            with httpx.Client(timeout=self.timeout) as client:
+                resp = client.post(f"{self.base_url}/api/generate", json=payload)
+        except httpx.TimeoutException as exc:
+            raise ProviderError(
+                f"Mullama request timed out after {self.timeout}s",
+                provider=self.name,
+                retriable=True,
+            ) from exc
+        except httpx.RequestError as exc:
+            raise ProviderError(
+                f"Mullama connection failed: {exc}",
+                provider=self.name,
+                retriable=True,
+            ) from exc
+
+        if resp.status_code != 200:
+            raise ProviderError(
+                f"Mullama returned HTTP {resp.status_code}: {resp.text[:200]}",
+                provider=self.name,
+            )
+
+        try:
+            data = resp.json()
+        except Exception as exc:
+            raise ProviderError("Mullama returned non-JSON response", provider=self.name) from exc
+
+        text = (data.get("response") or "").strip()
+        if not text:
+            raise ProviderError("Mullama returned empty response", provider=self.name)
+
+        return ProviderResponse(text=text, provider=self.name, model=self.model, raw=data)

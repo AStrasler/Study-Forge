@@ -11,7 +11,9 @@ from config.settings import Settings
 from utils.logging import get_logger
 
 from .base import BaseProvider, ProviderError, ProviderResponse
+from .fox import FoxProvider
 from .groq import GroqProvider
+from .mullama import MullamaProvider
 from .ollama import OllamaProvider
 
 logger = get_logger(__name__)
@@ -24,16 +26,24 @@ class ProviderManager:
         self._build_providers()
 
     def _build_providers(self) -> None:
-        # Local
-        if self.settings.local_provider == "ollama":
-            self._providers["ollama"] = OllamaProvider(
-                model=self.settings.local_model,
-                base_url=self.settings.ollama_base_url,
-                timeout=self.settings.provider_timeout,
-            )
-        # Future: fox, mullama
+        # Local — always register; is_available() gates use
+        self._providers["ollama"] = OllamaProvider(
+            model=self.settings.local_model,
+            base_url=self.settings.ollama_base_url,
+            timeout=self.settings.provider_timeout,
+        )
+        self._providers["fox"] = FoxProvider(
+            model=self.settings.fox_model,
+            base_url=self.settings.fox_base_url,
+            timeout=self.settings.fox_timeout,
+        )
+        self._providers["mullama"] = MullamaProvider(
+            model=self.settings.mullama_model,
+            base_url=self.settings.mullama_base_url,
+            timeout=self.settings.provider_timeout,
+        )
 
-        # Cloud — only register when credentials exist
+        # Cloud — only when credentials exist
         if self.settings.groq_api_key:
             self._providers["groq"] = GroqProvider(
                 api_key=self.settings.groq_api_key,
@@ -52,10 +62,6 @@ class ProviderManager:
         return ordered
 
     def generate(self, prompt: str, *, system: Optional[str] = None, **kwargs: Any) -> ProviderResponse:
-        """
-        Try providers in configured order until one succeeds.
-        Only real provider failures trigger the next fallback.
-        """
         last_error: Optional[Exception] = None
         ordered = self.get_ordered_providers()
 
