@@ -1,944 +1,823 @@
+Yes. The README needs one **major conceptual correction** now: **“local-first” no longer means “runs on the student's PC.”** It means **private/local inference is the preferred processing path**, while the **application itself can be web-hosted**.
+
+That distinction needs to be unmistakable, otherwise someone reading the repo will walk away thinking Study Forge is still fundamentally a desktop/local script. Your current README still says things like “runs 100% free on your own computer,” which is now outdated. ([GitHub][1])
+
+I’d replace it with this:
+
+````markdown
 # 🔨 Study Forge
 
-> A local-first, private-inference-first study-material processing system. Transform lecture PDFs, PowerPoints, Word documents, and other study materials into structured, color-coded study notes and send them to your Notion workspace.
+> A local-first, web-accessible study-material processing tool that transforms lecture PDFs, PowerPoints, Word documents, and other study materials into structured, color-coded notes using a team of specialized AI agents.
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 
 ---
 
 ## 📌 What Is Study Forge?
 
-Study Forge is a personal/student-focused study-material processing system.
+Study Forge is a **local-first study-material processing system** designed to help students turn raw course materials into organized study resources.
 
-Its purpose is to:
+The system combines:
 
-1. Accept study materials.
-2. Extract their content.
-3. Process that content through specialized AI agents.
-4. Judge and synthesize the resulting outputs.
-5. Semantically classify the information.
-6. Preserve the generated study material.
-7. Optionally send the result to Notion.
-
-Study Forge is designed around:
-
-- Private/local inference as the preferred AI-processing path
-- Multiple private inference provider options
-- Optional BYOK cloud fallback
-- Modular AI agents
+- Document ingestion and text extraction
+- Specialized AI agents
+- Judge / synthesis processing
+- Semantic color classification
 - Structured study output
 - Notion integration
-- A $0-first philosophy
-- User-controlled infrastructure
-- No required Study Forge subscription
-- No centralized collection of user study material or API keys
+- Optional cloud AI fallback
 
-Study Forge is free/open-source software under **AGPL-3.0**.
+Study Forge is designed around a simple principle:
 
-It is intentionally **not designed as a conventional SaaS platform**.
+> **Private inference first. Cloud only when explicitly configured.**
+
+Study Forge is:
+
+- Free and open-source software
+- Designed with students and individual users in mind
+- Local-first in its AI architecture
+- BYOK (Bring Your Own Key) for cloud providers
+- Deployment-agnostic
+- Capable of running locally, on a private server, VPS, or hosted infrastructure controlled by the user
+
+Study Forge is **not** designed as a subscription SaaS product.
 
 ---
 
-# 🧭 Core Architectural Principle
+# 🎯 Why Does It Exist?
 
-## Local-first does not mean laptop-only.
+Students spend significant time turning lecture slides, handouts, and other course materials into usable study resources.
 
-Study Forge is **local-first at the inference and privacy level**.
+Study Forge is intended to automate the repetitive parts of that process while keeping the underlying study material under the user's control.
 
-The preferred AI-processing path is private inference using:
+It can produce:
+
+- Concise lecture summaries
+- Key takeaways
+- Flashcards
+- Definitions
+- Structured notes
+- Semantic color classifications
+- Notion-ready study material
+
+The goal is to reduce formatting and organization work so the student can spend more time actually studying.
+
+---
+
+# 🧠 Architecture
+
+Study Forge separates **where the application is accessed** from **where AI inference occurs**.
+
+This distinction is important.
+
+### Web-hosted application
+
+The dashboard can be accessed through a web browser.
+
+The user does not need to run the dashboard directly on their laptop or desktop.
+
+### Private-first inference
+
+The preferred AI processing path uses private/local inference through:
 
 - Ollama
 - Fox
 - Mullama
 
-Cloud AI providers are optional BYOK fallbacks.
+These providers can run on infrastructure controlled by the user.
 
-The Study Forge engine itself is deployment-agnostic.
+That infrastructure may be:
 
-It can run:
+- The user's computer
+- A home server
+- A VPS
+- A dedicated server
+- Other infrastructure controlled by the user
 
-- Locally on a personal computer
-- On a home server
-- On a VPS
-- On other infrastructure controlled by the user
-- Behind a secure tunnel
-- As the backend for a web dashboard
+Therefore, **local-first does not require client-local execution**.
 
-The current direction is moving toward a **web-hosted personal instance** so the user does not have to run the entire inference stack directly on their laptop or desktop.
-
-The important distinction is:
-
-> **Private inference is the preferred processing path. The physical machine running that inference can change.**
+The application can be web-accessible while still using private inference as its primary AI path.
 
 ---
 
-# 🌐 Web Deployment Direction
+## 🌐 Deployment Model
 
-Study Forge is being developed toward a web-accessible personal instance at:
-
-`studyforge.studio`
+The current direction of Study Forge is toward a **web-hosted dashboard**.
 
 The intended architecture is:
 
 ```text
-                     Browser
-                        │
-                        ▼
-              studyforge.studio
-                        │
-                        ▼
-              Secure Access Layer
-                        │
-                        ▼
-              Study Forge Dashboard
-                        │
-                        ▼
-               Study Forge API/Core
-                        │
-                        ▼
-              ┌───────────────────┐
-              │ Private Inference │
-              └───────────────────┘
-                   │     │     │
-                   ▼     ▼     ▼
-                Ollama  Fox  Mullama
-                   │
-                   │
-                   ⋮
-                   ⋮  optional fallback
-                   ⋮
-                   └ - - - - - - - - - - - - - - - - ▶
-                                      Cloud AI
-                                         │
-                              ┌──────────┼──────────┐
-                              ▼          ▼          ▼
-                            Groq     Cloudflare   Gemini
-                                         │
-                                         ▼
-                                   Hugging Face
+                    ┌──────────────────────┐
+                    │       Browser        │
+                    │  Study Forge UI      │
+                    └──────────┬───────────┘
+                               │
+                               │ HTTPS
+                               ▼
+                    ┌──────────────────────┐
+                    │   Study Forge        │
+                    │   Web Application    │
+                    │      / API            │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │   Private Inference  │
+                    │                      │
+                    │ Ollama / Fox /       │
+                    │ Mullama              │
+                    └──────────┬───────────┘
+                               │
+                               │
+                    ┌──────────▼───────────┐
+                    │   Study Forge        │
+                    │   Agent Pipeline     │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │   Structured Output  │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │       Notion         │
+                    └──────────────────────┘
+````
 
+### Optional Cloud Fallback
 
-The dashed relationship represents the optional cloud fallback path.
+Cloud AI is **not the primary processing path**.
 
-A successful private inference provider should prevent unnecessary cloud processing.
+If private inference is unavailable, fails, or is intentionally configured to use cloud inference, Study Forge can fall back to user-configured cloud providers.
 
-The web dashboard does not change the local-first architecture.
+```text
+                PRIVATE-FIRST PATH
+                       │
+                       ▼
+              Ollama / Fox / Mullama
+                       │
+                 failure / unavailable
+                       │
+                       ┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊┊
+                       ┊ OPTIONAL CLOUD
+                       ▼
+                    Groq
+                       │
+                       ▼
+                Cloudflare AI
+                       │
+                       ▼
+                  Google Gemini
+                       │
+                       ▼
+                  Hugging Face
+                       │
+                       ▼
+                Log / handle failure
+```
 
-Instead, it provides a browser-based interface to a Study Forge instance running on infrastructure controlled by the owner.
+The dashed transition represents the **optional cloud fallback path**.
 
-The goal
+Cloud processing does not occur simply because Study Forge is web-hosted.
 
-Keep the engine private-first while removing the requirement that the user's personal computer carry the inference workload.
+A cloud provider must be explicitly configured by the user.
 
-This means the user can access their Study Forge instance from a browser without requiring Ollama or another inference runtime to consume resources on their everyday laptop.
+---
 
-🔐 Privacy Model
+# 🔐 Privacy Model
 
-Study Forge is designed around user-controlled processing.
+Study Forge distinguishes between **web access** and **AI inference**.
 
-When private inference is available:
+A web-hosted Study Forge instance does not inherently mean that study material is sent to third-party AI providers.
 
-Study Material
-      ↓
-Study Forge
-      ↓
+The preferred path is:
+
+```text
+User
+ ↓
+Study Forge Web Application
+ ↓
 Private Inference
-      ↓
-Generated Study Material
+ ↓
+Study Forge Pipeline
+```
 
-The study material does not need to be sent to a third-party AI provider.
+Cloud processing is an optional path:
 
-Cloud AI is only used when:
+```text
+User
+ ↓
+Study Forge Web Application
+ ↓
+Private Inference unavailable / insufficient
+ ┊
+ ┊ optional fallback
+ ▼
+User-configured Cloud Provider
+```
 
-The user has configured a cloud provider.
-The provider is enabled.
-The configured private inference path has failed or is otherwise unavailable according to the fallback configuration.
+No study material should be sent to a cloud AI provider unless the user has configured and enabled that provider.
 
-Notion is an explicit output destination and therefore requires user configuration.
+Study Forge should not introduce:
 
-Study Forge does not intentionally add:
+* Telemetry
+* Unnecessary analytics
+* Centralized document collection
+* Advertising
+* Unnecessary tracking
+* A centralized Study Forge AI service
 
-Telemetry
-Analytics
-Advertising
-Centralized document collection
-Centralized AI API-key storage
-Unnecessary tracking
-🎯 Intended Workflow
-📄 Study Material
-        ↓
-📖 Text Extraction
-        ↓
-┌───────┼──────────┬────────────┐
-↓       ↓          ↓            ↓
-📝      📌         🃏           📖
-Summary Key Points Flashcards Definitions
-        ↓
-        └──────────┬────────────┘
-                   ↓
-            ⚖️ Judge / Synthesis
-                   ↓
-             🎨 Color Coder
-                   ↓
-          💾 Local/Instance Result
-                   ↓
-          📤 Optional Notion
+---
 
-The generated result should be preserved independently of Notion.
+# 🤖 AI Provider Architecture
 
-If Notion is unavailable, the generated study material should remain available.
+Study Forge uses a provider abstraction so the processing pipeline is not permanently tied to one AI provider.
 
-🤖 Multi-Agent Architecture
+## Private / Local Providers
 
-Study Forge intentionally uses specialized agents rather than one giant prompt.
+| Provider    | Purpose                                   | API Key |
+| ----------- | ----------------------------------------- | ------- |
+| **Ollama**  | Local model inference                     | No      |
+| **Fox**     | Local inference                           | No      |
+| **Mullama** | Local/in-process inference and embeddings | No      |
 
-Agent	Responsibility
-Summarizer	Creates a concise lecture summary
-Key Points	Extracts approximately 5–8 important takeaways
-Flashcards	Generates Q&A pairs for active recall
-Definitions	Identifies and explains important terminology
-Judge / Synthesis	Compares, filters, reconciles, and synthesizes agent outputs
-Color Coder	Semantically classifies the synthesized material
-Judge
+These are intentional alternatives, not aliases for one implementation.
 
-The Judge is not simply another independent generator.
+The provider layer should allow the user to select which private inference engine they want to use.
 
-It receives the specialized agent outputs and:
+---
 
-Compares them
-Identifies weak or redundant information
-Reconciles conflicts
-Produces the synthesized result
+## ☁️ Optional Cloud Providers
 
-The Judge may use the configured provider system, but it must remain a distinct processing stage with its own role and prompt.
+Cloud providers operate under a **BYOK (Bring Your Own Key)** model.
 
-Color Coder
+| Provider          | Type  | User Credentials Required |
+| ----------------- | ----- | ------------------------- |
+| **Groq**          | Cloud | Yes                       |
+| **Cloudflare AI** | Cloud | Yes                       |
+| **Google Gemini** | Cloud | Yes                       |
+| **Hugging Face**  | Cloud | Yes                       |
 
-The Color Coder is a separate stage after synthesis.
-
-It receives the Judge's output and applies the semantic color classifications defined by Study Forge.
-
-🎨 Semantic Color System
-
-Colors represent functional information classifications, not UI decoration.
-
-These values are project-level semantic anchors and should not be arbitrarily replaced.
-
-Color	Hex	Category
-⚫ Black	#000000	Main Topics / Headers
-🔵 Blue	#0000FF	Standard Notes
-🩵 Light Blue	#ADD8E6	Scanning Protocols / Positioning
-🔷 Navy	#000080	Anatomical Structures / Pathologies
-🟣 Purple	#800080	Physics / Math / Formulas
-🩷 Pink	#FF69B4	Clinical Red Flags / Contraindications / Safety
-🟢 Green	#008000	Professor Tips / Clinical Application
-🔴 Red	#FF0000	Corrections / Professor Emphasis
-
-Classification should be contextual and semantic rather than relying solely on simplistic keyword matching where practical.
-
-When an output destination cannot represent arbitrary hexadecimal colors, Study Forge may map the semantic classification to the closest supported representation while preserving the underlying classification.
-🧠 Private Inference Architecture
-
-Private inference is the preferred AI-processing path.
-
-The intended private provider layer is:
-
-              Study Forge
-                   │
-                   ▼
-          Private Provider Layer
-                   │
-        ┌──────────┼──────────┐
-        ▼          ▼          ▼
-     Ollama       Fox       Mullama
-
-These are intentional architectural choices.
-
-Ollama
-
-Local inference runtime and the initial private-provider implementation.
-
-Fox
-
-Intentional alternative private inference provider.
-
-Mullama
-
-Intentional alternative private/in-process inference provider.
-
-Fox and Mullama are not obsolete or optional ideas to be removed simply because Ollama is implemented first.
-
-They are part of the intended provider architecture.
-
-The implementation should close the current Fox/Mullama gap through the existing provider abstraction rather than redesigning the application around Ollama alone.
-
-🔌 Provider Abstraction
-
-Study Forge uses a provider abstraction so the core pipeline is not permanently tied to a single AI runtime.
-
-A provider should expose a consistent interface capable of supporting operations such as:
-
-generate(...)
-is_available(...)
-name(...)
-
-The exact implementation may evolve as required by the actual provider APIs.
-
-The core application should not need to know provider-specific implementation details.
-
-The provider layer should allow:
-
-Providers to be enabled or disabled
-Providers to be reordered
-Providers to be replaced
-Providers to be tested independently
-Private providers to be exhausted before cloud fallback
-
-Do not hard-code the application around one provider.
-
-☁️ Optional Cloud Providers — BYOK
-
-Cloud AI is an optional fallback, not the primary architecture.
-
-The intended cloud providers are:
-
-Provider	Role	Status
-Groq	Cloud fallback	✅ Implemented
-Cloudflare AI	Cloud fallback	🚧 Pending completion
-Google Gemini	Cloud fallback	🚧 Pending completion
-Hugging Face	Cloud fallback	🚧 Pending completion
-
-Cloud providers use BYOK.
-
-Study Forge does not provide API keys.
+Study Forge does **not** provide API keys.
 
 Users are responsible for:
 
-Their provider accounts
-Their API credentials
-Provider quotas
-Provider-side limits
-Provider-side costs
+* Creating their own provider accounts
+* Creating their own API credentials
+* Provider usage limits
+* Provider terms
+* Provider privacy policies
+* Any provider charges
 
-Provider free tiers and pricing may change and should be verified against current provider documentation.
+Study Forge itself does not require users to purchase an API subscription.
 
-🔄 Fallback Architecture
+---
 
-The fallback chain is intentionally modular.
+# 🔄 Provider Fallback
 
-Conceptually:
+The provider system should be modular and configurable.
 
-Private Provider
-      ↓
-failure / unavailable
-      ↓
-Next configured Private Provider
-      ↓
-failure / unavailable
-      ↓
-Next configured Private Provider
-      ↓
-failure / unavailable
-      ↓
-- - - - - - - - - - - - - - - - -
-      ↓
-Optional Cloud Fallback
-      ↓
-Groq
-      ↓
-Cloudflare AI
-      ↓
-Google Gemini
-      ↓
-Hugging Face
-      ↓
-Log failure
+The conceptual fallback order is:
 
-The exact order should be configurable.
+1. Private inference provider
+2. Groq
+3. Cloudflare AI
+4. Google Gemini
+5. Hugging Face
+6. Log failure / handle the document appropriately
 
-Provider Failure
+The actual order should be configurable rather than permanently hard-coded.
 
-A provider is considered failed when there is an actual execution/configuration problem, such as:
+A provider may be considered unavailable when it:
 
-Provider unavailable
-Connection failure
-Timeout
-Runtime exception
-Invalid provider response
-Malformed expected response
-Missing required configuration
+* Is not installed
+* Is not configured
+* Cannot be reached
+* Times out
+* Returns an error
+* Returns unusable output
 
-A subjective judgment that an AI response is "not good enough" is not automatically a provider failure.
+One provider failing should not unnecessarily terminate processing when another configured provider is available.
 
-Provider quality evaluation is a separate concern.
+---
 
-🔐 BYOK Security
+# 🧠 Multi-Agent Pipeline
 
-BYOK means:
+Study Forge does not rely on one giant AI prompt.
 
-Bring Your Own Key
+Instead, the system uses specialized agents with distinct responsibilities.
 
-Study Forge does not centrally collect or manage users' cloud credentials.
+```text
+                    📄 Study Material
+                           │
+                           ▼
+                    📖 Text Extraction
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+         📝 Summary    📌 Key Points  🃏 Flashcards
+              │            │            │
+              └────────────┼────────────┘
+                           │
+                     📖 Definitions
+                           │
+                           ▼
+                  ⚖️ Judge / Synthesis
+                           │
+                           ▼
+                  🎨 Color Coder
+                           │
+                           ▼
+                  📤 Structured Output
+                           │
+                           ▼
+                        Notion
+```
+
+## Agents
+
+| Agent                    | Responsibility                                               |
+| ------------------------ | ------------------------------------------------------------ |
+| 📝 **Summarizer**        | Creates a concise lecture summary                            |
+| 📌 **Key Points**        | Extracts approximately 5–8 important takeaways               |
+| 🃏 **Flashcards**        | Creates Q&A pairs for active recall                          |
+| 📖 **Definitions**       | Identifies and explains important terminology                |
+| ⚖️ **Judge / Synthesis** | Compares, filters, reconciles, and synthesizes agent outputs |
+| 🎨 **Color Coder**       | Applies semantic classifications to the resulting material   |
+
+### Judge / Synthesis
+
+The Judge is not simply another content generator.
+
+Its purpose is to:
+
+* Compare agent outputs
+* Identify weak or redundant information
+* Reconcile conflicting outputs
+* Preserve useful information
+* Produce a coherent final result
+
+The Judge may use the same provider infrastructure as the other agents while using a distinct prompt and role.
+
+---
+
+# 🎨 Semantic Color System
+
+Colors represent **meaning**, not UI decoration.
+
+These values are intentional and should be preserved.
+
+| Color         | Hex       | Category                                        |
+| ------------- | --------- | ----------------------------------------------- |
+| ⚫ Black       | `#000000` | Main Topics / Headers                           |
+| 🔵 Blue       | `#0000FF` | Standard Notes                                  |
+| 🩵 Light Blue | `#ADD8E6` | Scanning Protocols / Positioning                |
+| 🔷 Navy       | `#000080` | Anatomical Structures / Pathologies             |
+| 🟣 Purple     | `#800080` | Physics / Math / Formulas                       |
+| 🩷 Pink       | `#FF69B4` | Clinical Red Flags / Contraindications / Safety |
+| 🟢 Green      | `#008000` | Professor Tips / Clinical Application           |
+| 🔴 Red        | `#FF0000` | Corrections / Professor Emphasis                |
+
+Classification should be contextual and semantic rather than relying exclusively on simplistic keyword matching.
+
+---
+
+# 📥 Input Formats
+
+Initial priority:
+
+| Format        | Status        |
+| ------------- | ------------- |
+| PDF           | 🚧 Core       |
+| DOCX          | 🚧 Core       |
+| PPTX          | 🚧 Core       |
+| TXT / MD      | 🚧 Supporting |
+| Images / OCR  | 🔮 Future     |
+| Audio / Video | 🔮 Future     |
+
+Future formats should be added through the ingestion layer without requiring major changes to the rest of the pipeline.
+
+---
+
+# 📤 Outputs
+
+Primary output:
+
+**Notion**
+
+Planned structured content includes:
+
+* Summary
+* Key Points
+* Definitions
+* Flashcards
+* Color-Coded Notes
+* Source File
+* Processing Date
+
+The output layer should remain modular so additional destinations can be added later.
+
+Potential future output:
+
+* Obsidian
+* Other structured study systems
+
+---
+
+# 📝 Notion Integration
+
+Study Forge uses the user's own Notion integration.
+
+The user provides:
+
+* Notion API token
+* Notion database ID
+
+The Notion integration should create structured study entries containing the generated material.
+
+Notion credentials must never be hard-coded or committed to the repository.
+
+---
+
+# 💰 Cost Model
+
+Study Forge follows a **$0-first** development and usage philosophy.
+
+### Private inference
+
+Private inference can operate without paid AI API services.
+
+### Cloud fallback
+
+Cloud providers use BYOK.
+
+Users supply their own credentials and use whatever free tier or paid plan the provider currently offers.
+
+Study Forge does not guarantee that any third-party provider will remain free.
+
+The project itself does not require a Study Forge subscription.
+
+---
+
+# 🔑 BYOK
+
+Study Forge does not provide centralized AI access.
+
+Users provide their own credentials for services they choose to enable.
 
 Never:
 
-Hard-code API keys
-Commit real credentials
-Put real credentials in README.md
-Put real credentials in source code
-Print credentials in logs
-Create a centralized Study Forge API-key service
+* Hard-code API keys
+* Commit API keys
+* Store real credentials in `.env.example`
+* Print credentials in logs
+* Create a centralized Study Forge API key
+* Collect user provider credentials
 
-Use environment variables or secure deployment configuration.
+Use environment variables or another secure configuration mechanism.
 
-.env must remain excluded from version control.
+---
 
-.env.example contains placeholders only.
+# ⚙️ Configuration
 
-💰 $0-First Philosophy
+Study Forge should centralize configuration for:
 
-Study Forge is developed under a $0-first constraint.
-
-Priority is:
-
-Private/local inference
-Free and open-source tooling
-Free provider tiers where available
-User-controlled infrastructure
-BYOK cloud providers when needed
-
-Study Forge itself should not require:
-
-A paid subscription
-A Study Forge account
-A Study Forge-hosted API
-A Study Forge billing system
-
-Users may independently choose paid infrastructure or provider plans if they want them.
-
-📥 Supported Inputs
-Format	Status
-PDF	✅ Implemented
-DOCX	✅ Implemented
-PPTX	✅ Implemented
-TXT	✅ Implemented
-Markdown	✅ Implemented
-Images / OCR	🔮 Planned
-Audio / Video	🔮 Planned
-
-Future formats should be implemented through the ingestion layer.
-
-They should not require expanding main.py into format-specific logic.
-
-📤 Outputs
-Output	Status
-Local JSON results	✅ Implemented
-Local Markdown results	✅ Implemented
-Summary	✅ Implemented
-Key Points	✅ Implemented
-Flashcards	✅ Implemented
-Definitions	✅ Implemented
-Judge/Synthesized Notes	✅ Implemented
-Color-Coded Content	✅ Implemented
-Notion	✅ Implemented
-Obsidian	🔮 Future
-
-Notion is currently the primary external output.
-
-Obsidian is intentionally a future output target rather than a first-version requirement.
-
-📁 Repository Structure
-
-The project separates major responsibilities:
-
-Study-Forge/
-│
-├── agents/
-│   ├── summarizer.py
-│   ├── key_points.py
-│   ├── flashcards.py
-│   ├── definitions.py
-│   ├── judge.py
-│   └── color_coder.py
-│
-├── config/
-│   └── settings.py
-│
-├── ingestion/
-│   └── extractors.py
-│
-├── input/
-│
-├── output/
-│   └── notion.py
-│
-├── pipeline/
-│   └── processor.py
-│
-├── providers/
-│   ├── base.py
-│   ├── manager.py
-│   ├── ollama.py
-│   ├── groq.py
-│   ├── fox.py
-│   └── mullama.py
-│
-├── results/
-│
-├── utils/
-│
-├── .env.example
-├── .gitignore
-├── LICENSE
-├── README.md
-├── main.py
-└── requirements.txt
-
-The exact filenames may evolve with implementation.
-
-The architectural separation should not.
-
-main.py should remain an entry point/orchestrator rather than becoming a monolithic application file.
-
-📊 Current Implementation Status
-✅ Implemented
-Repository/package structure
-Centralized configuration
-Environment-based configuration
-Provider abstraction
-Provider manager
-Ollama provider
-Groq provider
-PDF extraction
-DOCX extraction
-PPTX extraction
-TXT/Markdown extraction
-Sequential file processing
-Specialized agents
-Judge/Synthesis
-Semantic Color Coder
-Local result persistence
-Markdown result generation
-JSON result generation
-Notion output
-Error handling/logging
-.env.example
-AGPL-3.0 licensing
-🚧 Current Development / Verification
-Fox provider
-Mullama provider
-Multi-private-provider fallback
-Cloudflare AI provider
-Google Gemini provider
-Hugging Face provider
-Complete provider fallback verification
-End-to-end verification
-Failure-path testing
-Configuration validation
-Notion integration verification
-Output validation
-Web/API layer
-🔮 Future
-Web dashboard
-Browser-based upload workflow
-Secure remote access
-Server-hosted Study Forge engine
-Server-hosted private inference
-Images / OCR
-Audio / Video ingestion
-Obsidian output
-Additional deployment options
-🎯 Immediate Development Priorities
-
-The next development work should proceed in this order.
-
-1. Complete the Private Provider Layer
-
-Verify the existing Ollama implementation.
-
-Then implement:
-
-Fox
-Mullama
-
-Do not remove either provider from the architecture simply because implementation begins with Ollama.
-
-2. Complete Private Provider Fallback
-
-Verify that the system can move between configured private providers.
-
-Example:
-
-Ollama
-   ↓ failure
-Fox
-   ↓ failure
-Mullama
-   ↓ failure
-Optional Cloud Fallback
-
-Private providers should be exhausted before cloud fallback begins.
-
-3. Complete Cloud Providers
-
-Implement and verify:
-
-Groq
-Cloudflare AI
-Google Gemini
-Hugging Face
-
-Cloud remains optional.
-
-4. Verify the Core Pipeline
-
-Test:
-
-Input
- ↓
-Extraction
- ↓
-Summarizer
- ↓
-Key Points
- ↓
-Flashcards
- ↓
-Definitions
- ↓
-Judge
- ↓
-Color Coder
- ↓
-Local/Instance Result
- ↓
-Notion
-5. Verify Failure Boundaries
-
-Test that:
-
-One provider failure does not destroy the pipeline.
-Private-provider failures trigger the next configured private provider.
-Cloud fallback does not occur while an available private provider can process successfully.
-A failed cloud provider moves to the next configured cloud provider.
-A malformed input does not stop the entire batch.
-Notion failure does not destroy generated local/instance output.
-Missing credentials produce useful errors.
-Secrets never appear in logs.
-🌐 Web/API Direction
-
-The web interface is being developed as a presentation and control layer over the Study Forge engine.
-
-The browser should communicate with the Study Forge backend through an API.
-
-Conceptually:
-
-Browser
-   │
-   ▼
-Study Forge Web/API
-   │
-   ├── Upload
-   ├── Queue
-   ├── Processing Status
-   ├── Provider Status
-   ├── Results
-   └── Settings
-   │
-   ▼
-Study Forge Core
-   │
-   ▼
-Provider Layer
-   │
-   ▼
-Private / Optional Cloud AI
-
-The core processing pipeline should remain independent from the web interface.
-
-This is important because the same Study Forge engine should remain capable of running:
-
-Locally
-On a server
-Behind a tunnel
-As the backend of the web dashboard
-
-The web layer should not require rewriting the core pipeline.
-
-🔒 Web Access Model
-
-The planned personal web instance is intended to be protected by a secure access layer such as Cloudflare Zero Trust.
-
-The project is not introducing a public signup system.
-
-The intended model is:
-
-Authorized User
-      ↓
-Secure Access
-      ↓
-Personal Study Forge Instance
-
-This is a personal/user-controlled deployment model.
-
-It is not intended to become:
-
-Public Signup
-      ↓
-Multi-Tenant SaaS
-      ↓
-Study Forge Managed Accounts
-      ↓
-Study Forge Billing
-
-Those systems are explicitly outside the current project scope.
-
-🧪 Testing Expectations
-
-Testing should demonstrate actual behavior rather than assuming functionality works.
-
-Minimum verification includes:
-
- Ollama responds
- Fox responds
- Mullama responds
- Private-provider fallback works
- Groq responds
- Cloudflare AI responds
- Gemini responds
- Hugging Face responds
- Cloud fallback works
- PDF extraction works
- DOCX extraction works
- PPTX extraction works
- TXT/MD extraction works
- Summarizer works
- Key Points works
- Flashcards works
- Definitions works
- Judge works
- Color Coder works
- Local/instance result persistence works
- Notion authentication works
- Notion output works
- End-to-end processing works
- Failed input does not stop the batch
- Notion failure preserves generated output
- Secrets are not exposed in logs
- Web/API upload works
- Web/API processing status works
- Web/API result retrieval works
- Private inference works through the deployed instance
-⚙️ Configuration
-
-Configuration is centralized.
-
-Example configuration categories include:
-
-LOCAL_PROVIDER=
+```text
+PRIVATE_PROVIDER=
 LOCAL_MODEL=
 
-
-OLLAMA_BASE_URL=
-
-
-PROVIDER_FALLBACK_ORDER=
-
-
 GROQ_API_KEY=
-GROQ_MODEL=
-
-
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
-
-
 GEMINI_API_KEY=
-GEMINI_MODEL=
-
-
 HUGGINGFACE_API_KEY=
-HUGGINGFACE_MODEL=
-
 
 NOTION_API_TOKEN=
 NOTION_DATABASE_ID=
 
-
 INPUT_FOLDER=
-OUTPUT_FOLDER=
+```
 
+Exact variable names may evolve with implementation, but configuration must remain consistent throughout the project.
 
-PROVIDER_TIMEOUT=
-LOG_LEVEL=
+A `.env.example` file should contain placeholders only.
 
-The exact variables should remain consistent with the implementation.
+---
 
-Never commit:
+# 🌐 Web Dashboard
 
-.env
+The planned Study Forge dashboard provides a browser-based interface for the system.
 
-or real credentials.
+The dashboard is intended to allow the user to:
 
-🛡️ Error Handling
+* Authenticate
+* Upload study materials
+* Monitor processing
+* View results
+* Manage configuration
+* Trigger processing
+* Access generated study material
+
+The dashboard is an interface to the Study Forge engine.
+
+It does **not** change the underlying local-first AI architecture.
+
+The engine should remain deployment-agnostic.
+
+It should be possible to run the same core system:
+
+* Locally
+* On a private server
+* On a VPS
+* Behind a secure tunnel
+* As part of a web-hosted personal instance
+
+---
+
+# ☁️ Hosting Philosophy
+
+Study Forge is not intended to become a centralized SaaS platform.
+
+The intended model is closer to:
+
+> **Your instance. Your infrastructure. Your keys. Your data.**
+
+A hosted personal instance can provide the convenience of browser access without requiring the user's laptop to perform all inference locally.
+
+This is particularly useful for users who do not want to dedicate significant CPU, RAM, GPU, or storage resources on their personal computer to AI inference.
+
+---
+
+# 🔒 Web Access & Security
+
+If the web dashboard is exposed to the internet, it must be protected appropriately.
+
+The planned deployment may use Cloudflare Zero Trust or another suitable access-control layer.
+
+Security requirements include:
+
+* HTTPS
+* Authentication/access control
+* Secure credential storage
+* No credentials in source code
+* No credentials in logs
+* Restricted administrative access
+* Appropriate server-side file handling
+* Safe temporary file handling
+* No unnecessary public exposure of inference services
+
+Cloudflare services should only be introduced where they provide a concrete security, networking, or deployment benefit.
+
+---
+
+# 🧩 Deployment-Agnostic Core
+
+The Study Forge engine should not be tightly coupled to a specific hosting provider.
+
+The architecture should separate:
+
+```text
+Frontend / Dashboard
+        ↓
+Web API
+        ↓
+Study Forge Core
+        ↓
+Provider Layer
+        ↓
+Inference Provider
+        ↓
+Pipeline
+        ↓
+Output Layer
+```
+
+This allows the same core processing system to be deployed in different environments without rewriting the application.
+
+---
+
+# 📊 Implementation Status
+
+This table reflects the development direction, not a claim that every planned feature already exists.
+
+| Component                           | Status            |
+| ----------------------------------- | ----------------- |
+| Project structure                   | 🚧 In Development |
+| README / architecture documentation | ✅                 |
+| AGPL-3.0 license                    | ✅                 |
+| Configuration system                | 🚧                |
+| Provider abstraction                | 🚧                |
+| Ollama support                      | 🚧                |
+| Fox support                         | 🚧                |
+| Mullama support                     | 🚧                |
+| Cloud provider abstraction          | 🚧                |
+| Cloud fallback                      | 🚧                |
+| PDF ingestion                       | 🔮                |
+| DOCX ingestion                      | 🔮                |
+| PPTX ingestion                      | 🔮                |
+| Multi-agent pipeline                | 🔮                |
+| Judge / Synthesis                   | 🔮                |
+| Color classification                | 🔮                |
+| Notion integration                  | 🔮                |
+| Web API                             | 🔮                |
+| Web dashboard                       | 🔮                |
+| Cloudflare Zero Trust deployment    | 🔮                |
+| Obsidian output                     | 🔮                |
+
+Status markers should be updated as implementation progresses.
+
+---
+
+# 🚀 Development Priorities
+
+The implementation should proceed in practical stages.
+
+### Phase 1 — Core Engine
+
+* Configuration
+* Provider abstraction
+* Private inference
+* Cloud fallback
+* File ingestion
+* Specialized agents
+* Judge
+* Color classification
+* Structured output
+
+### Phase 2 — Integrations
+
+* Notion
+* Additional input formats
+* Additional output formats
+
+### Phase 3 — Web Deployment
+
+* Web API
+* Dashboard
+* Authentication
+* Secure file uploads
+* Server-side processing
+* Private inference hosting
+* Cloudflare/access-control integration
+
+### Phase 4 — Future Features
+
+* Obsidian sync
+* OCR
+* Audio/video ingestion
+* Additional providers
+* Additional study workflows
+
+Features that are not required for the current milestone should not block the core system.
+
+---
+
+# 🧪 Testing
+
+Study Forge should provide tests demonstrating:
+
+* Private provider availability
+* Cloud provider availability
+* PDF extraction
+* DOCX extraction
+* PPTX extraction
+* Summarizer
+* Key Points
+* Flashcards
+* Definitions
+* Judge / Synthesis
+* Color classification
+* Notion authentication
+* Notion output
+* End-to-end processing
+* Private-provider failure
+* Cloud fallback
+* Provider-to-provider fallback
+* Web API functionality
+* Secure upload handling
+
+Tests should demonstrate actual behavior rather than relying solely on assumptions.
+
+---
+
+# 🛠️ Error Handling
 
 Study Forge should fail gracefully.
 
 Examples:
 
-Provider unavailable
-Provider unavailable
-        ↓
-Log useful error
-        ↓
-Try next configured provider
-Malformed document
-Bad document
-    ↓
-Log error
-    ↓
-Skip document
-    ↓
-Continue processing remaining files
-Notion failure
-Generated study material
-        ↓
-Notion unavailable
-        ↓
-Preserve local/instance result
-        ↓
-Report Notion error
+* Private provider unavailable → attempt configured fallback
+* Cloud provider unavailable → attempt next configured provider
+* Malformed document → log the error and continue where possible
+* Missing credentials → provide a clear configuration error
+* Provider timeout → record the failure and continue through the fallback chain
+* Notion unavailable → preserve generated output rather than unnecessarily losing the processing result
 
-Errors must not be silently swallowed.
+Errors should be logged clearly without exposing secrets.
 
-Logs should contain enough information to diagnose failures without exposing credentials or sensitive secrets.
+---
 
-📜 Licensing
+# 🚫 Do Not Overengineer
 
-Study Forge is licensed under:
+Study Forge is a student/personal project.
 
-GNU Affero General Public License v3.0 (AGPL-3.0)
+Do not introduce unnecessary:
 
-The AGPL-3.0 license is intentional.
+* User account systems beyond what is required to secure the personal web instance
+* Subscription systems
+* Billing
+* Enterprise infrastructure
+* Microservices
+* Centralized AI infrastructure
+* Telemetry
+* Analytics
+* Advertising
+* Unnecessary databases
+* Unnecessary cloud services
 
-Do not replace it with:
+The goal is a powerful personal study-processing system, not an enterprise SaaS platform.
 
-MIT
-Apache-2.0
-BSD
-Another permissive license
+---
 
-Do not add dependencies with incompatible licensing without identifying the issue first.
+# 🤝 Contributing
 
-Future dual licensing is a possible consideration, but it is not part of the current implementation.
+Study Forge is open-source software licensed under AGPL-3.0.
 
-AGPL-3.0 is the current licensing Reality Anchor.
+Contributions, improvements, bug reports, and ideas are welcome.
 
-See LICENSE for the complete license text.
+Please use GitHub Issues and Pull Requests for project contributions.
 
-🚫 Scope Boundaries
+---
 
-Study Forge is intentionally not building:
+# 📄 License
 
-User subscription systems
-Billing
-Public SaaS accounts
-Multi-tenant enterprise infrastructure
-Centralized API-key management
-Telemetry
-Analytics
-Advertising
-Unnecessary microservices
-Unnecessary databases
-Enterprise identity infrastructure
-A centralized Study Forge AI service
+Study Forge is licensed under the **GNU Affero General Public License v3.0**.
 
-The goal is a powerful personal/student study-processing system, not an enterprise SaaS platform.
+See [LICENSE](LICENSE) for the complete license text.
 
-🗺️ Development Philosophy
+AGPL-3.0 is an intentional project decision.
 
-The priority is:
+The current project uses AGPL-3.0 and that license should not be replaced without the project owner's approval.
 
-Working → Useful → Reliable → Polished
+Future dual-licensing possibilities may be considered separately, but **AGPL-3.0 is the current license and remains the project's licensing baseline.**
 
-Not:
+---
 
-Overengineered → Expensive → Complicated
+# 🙏 Acknowledgments
 
-Build the smallest system that correctly implements the architecture.
+Study Forge builds on and/or integrates with open-source and third-party technologies.
 
-When a feature is not required for the core pipeline, classify it as Phase 2 rather than allowing it to block the first working version.
+Special thanks to:
 
-🚀 First Major Completion Milestone
+* **Ollama** — Local AI inference
+* **Fox** — Local inference
+* **Mullama** — Local/in-process inference
+* **Groq** — Cloud inference
+* **Cloudflare** — Infrastructure and AI services
+* **Google Gemini** — Cloud AI
+* **Hugging Face** — AI models and infrastructure
+* **Notion** — Structured study output
+* **GitHub Education** — Supporting student developers
 
-The first major milestone is a verified end-to-end vertical slice:
+Study Forge does not claim ownership of these third-party technologies.
 
-Real Study Document
-        ↓
-Text Extraction
-        ↓
-Private AI Provider
-        ↓
-Specialized Agents
-        ↓
-Judge / Synthesis
-        ↓
-Semantic Color Coder
-        ↓
-Generated Study Result
-        ↓
-Notion
+---
 
-with verified failure behavior:
+# 🔨 The Core Idea
 
-Private Provider
-       ↓ failure
-Next Private Provider
-       ↓ failure
-Optional BYOK Cloud Provider
-       ↓ failure
-Next Cloud Provider
+Study Forge is built around a simple hierarchy:
 
-The system should work before optional polish or future integrations are prioritized.
-
-🔨 Project Direction
-
-Study Forge is evolving from a primarily local execution model toward a web-accessible, user-controlled deployment model.
-
-The architectural hierarchy remains:
-
-                USER-CONTROLLED INSTANCE
+```text
+                    STUDY FORGE
                          │
                          ▼
-                 Study Forge Core
+                  Web-accessible UI
                          │
                          ▼
-                PRIVATE INFERENCE
+                 Study Forge Engine
                          │
-              ┌──────────┼──────────┐
-              ▼          ▼          ▼
-           Ollama       Fox       Mullama
+                         ▼
+              ┌─────────────────────┐
+              │  PRIVATE INFERENCE  │
+              │                     │
+              │ Ollama / Fox /      │
+              │ Mullama             │
+              └──────────┬──────────┘
                          │
-                         ⋮
-                         ⋮
-                         └ - - - - - - - - - - - - ▶
-                              OPTIONAL BYOK CLOUD
+                         │ optional fallback
+                         ┊
+                         ▼
+              ┌─────────────────────┐
+              │    CLOUD / BYOK     │
+              │                     │
+              │ Groq / Cloudflare / │
+              │ Gemini / HF         │
+              └─────────────────────┘
 
-The browser is simply a new interface to the system.
+          Your instance. Your keys. Your data.
+```
 
-The privacy model, provider hierarchy, multi-agent pipeline, semantic color system, Notion output, AGPL license, and $0-first philosophy remain intact.
+**Private-first. Web-accessible. BYOK when cloud is needed.**
 
-Same engine. Same pipeline. Same provider architecture.
-Different deployment surface.
-
-🙏 Acknowledgments
-
-Study Forge is built using and alongside open-source software and AI tooling.
-
-Credit belongs to the projects, maintainers, and communities whose work makes this project possible.
-
-🔨 Final Principle
-
-Your instance. Your infrastructure. Your keys. Your data.
-
-Study Forge should remain private-first, modular, free/open-source, and useful to students without requiring them to buy into a SaaS platform.
+🔨
