@@ -1,4 +1,4 @@
--- Study Forge D1 schema (job metadata only)
+-- Study Forge D1 — job metadata (not full study content as system of record)
 CREATE TABLE IF NOT EXISTS jobs (
   id TEXT PRIMARY KEY,
   filename TEXT NOT NULL,
