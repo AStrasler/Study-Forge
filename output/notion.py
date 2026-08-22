@@ -9,13 +9,14 @@ Requires NOTION_API_TOKEN and NOTION_DATABASE_ID.
 - Applies the closest supported Notion text/block color for each
   semantic classification. Original hex + category are preserved
   in structured data and shown as labels where useful.
-- Source Files property uses GitHub raw URL if the file is in the repo.
+- Property payload is built from the live database schema so column
+  names/types (e.g. Source File as files vs rich_text) do not break pushes.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 from notion_client import Client
 
@@ -24,139 +25,167 @@ from utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-# Notion supports a fixed set of annotation/block colors — not arbitrary hex.
-# Map project semantic hex → closest supported Notion color.
-# Documented limitation: exact hex cannot be reproduced in Notion's API.
 HEX_TO_NOTION_COLOR: Dict[str, str] = {
-    "#000000": "default",           # Main Topics / Headers
-    "#0000FF": "blue",              # Standard Notes
-    "#ADD8E6": "blue_background",   # Scanning Protocols / Positioning
-    "#000080": "blue",              # Anatomical Structures / Pathologies
-    "#800080": "purple",            # Physics / Math / Formulas
-    "#FF69B4": "pink",              # Clinical Red Flags / Safety
-    "#008000": "green",             # Professor Tips / Clinical Application
-    "#FF0000": "red",               # Corrections / Professor Emphasis
+    "#000000": "default",
+    "#0000FF": "blue",
+    "#ADD8E6": "blue_background",
+    "#000080": "blue",
+    "#800080": "purple",
+    "#FF69B4": "pink",
+    "#008000": "green",
+    "#FF0000": "red",
 }
 
-BATCH_SIZE = 90  # stay under Notion's 100-children-per-request limit
+BATCH_SIZE = 90
 
-# Valid Notion colors for validation
 VALID_NOTION_COLORS = {
     "default", "gray", "brown", "orange", "yellow",
     "green", "blue", "purple", "pink", "red",
     "gray_background", "brown_background", "orange_background",
     "yellow_background", "green_background", "blue_background",
-    "purple_background", "pink_background", "red_background"
+    "purple_background", "pink_background", "red_background",
 }
 
-# GitHub raw URL base for files in this repository
-GITHUB_RAW_BASE = "https://raw.githubusercontent.com/AStrasler/Study-Forge/refs/heads/main/input/"
+# Preferred property names in order of preference
+TITLE_CANDIDATES = ("Name", "Title", "name", "title")
+SOURCE_CANDIDATES = ("Source File", "Source Files", "source_file", "Source")
+DATE_CANDIDATES = ("Processing Date", "Date", "Processed", "processing_date")
 
 
 def push_to_notion(result: Dict[str, Any], settings: Settings) -> bool:
     """
     Push study results to Notion.
 
-    Args:
-        result: The processed study result dictionary.
-        settings: Application settings containing Notion credentials.
-
     Returns:
-        True if successful, False otherwise.
+        True on success.
+
+    Raises:
+        Exception on failure (so the pipeline can record notion_error).
     """
     if not settings.notion_api_token or not settings.notion_database_id:
-        logger.error("Notion credentials are not configured")
-        return False
+        raise ValueError("Notion credentials are not configured")
 
-    try:
-        client = Client(auth=settings.notion_api_token)
-        title = result.get("source_file", "Untitled Study Note")
-        now = datetime.now(timezone.utc).isoformat()
+    client = Client(auth=settings.notion_api_token)
+    title = result.get("source_file", "Untitled Study Note")
+    now = datetime.now(timezone.utc).isoformat()
 
-        # Build properties with correct types
-        properties = _build_properties(result, title, now)
+    schema = _load_schema(client, settings.notion_database_id)
+    properties = _build_properties(result, title, now, schema)
+    children = _build_blocks(result)
 
-        # Build page children
-        children = _build_blocks(result)
+    first_batch = children[:BATCH_SIZE]
+    remaining = children[BATCH_SIZE:]
 
-        # Create page with first batch (or empty if no children yet)
-        first_batch = children[:BATCH_SIZE]
-        remaining = children[BATCH_SIZE:]
+    page = client.pages.create(
+        parent={"database_id": settings.notion_database_id},
+        properties=properties,
+        children=first_batch,
+    )
+    page_id = page["id"]
+    logger.info("Created Notion page %s for %s", page_id, title)
 
-        page = client.pages.create(
-            parent={"database_id": settings.notion_database_id},
-            properties=properties,
-            children=first_batch,
+    offset = 0
+    while offset < len(remaining):
+        batch = remaining[offset : offset + BATCH_SIZE]
+        client.blocks.children.append(block_id=page_id, children=batch)
+        offset += BATCH_SIZE
+        logger.info(
+            "Appended blocks %d–%d to page %s",
+            BATCH_SIZE + offset - len(batch) + 1,
+            BATCH_SIZE + offset,
+            page_id,
         )
-        page_id = page["id"]
-        logger.info("Created Notion page %s for %s", page_id, title)
 
-        # Append remaining batches
-        offset = 0
-        while offset < len(remaining):
-            batch = remaining[offset: offset + BATCH_SIZE]
-            client.blocks.children.append(block_id=page_id, children=batch)
-            offset += BATCH_SIZE
-            logger.info(
-                "Appended blocks %d–%d to page %s",
-                BATCH_SIZE + offset - len(batch) + 1,
-                BATCH_SIZE + offset,
-                page_id,
-            )
-
-        total = len(children)
-        logger.info("Pushed to Notion: %s (%d blocks)", title, total)
-        return True
-
-    except Exception as e:
-        logger.error("Notion push failed: %s", e)
-        return False
+    logger.info("Pushed to Notion: %s (%d blocks)", title, len(children))
+    return True
 
 
-def _build_properties(result: Dict[str, Any], title: str, now: str) -> Dict[str, Any]:
-    """
-    Build Notion page properties with correct types.
+def _load_schema(client: Client, database_id: str) -> Dict[str, str]:
+    """Return map of property name -> Notion property type."""
+    db = client.databases.retrieve(database_id=database_id)
+    props = db.get("properties") or {}
+    schema = {name: (meta.get("type") or "") for name, meta in props.items()}
+    logger.info("Notion DB properties: %s", schema)
+    return schema
 
-    The database columns must be:
-    - Name (Title)
-    - Source Files (Files & media)   <-- NOTE: plural "Files"
-    - Processing Date (Date)
-    """
-    properties = {
-        "Name": {
+
+def _find_prop(schema: Dict[str, str], candidates: Tuple[str, ...], allowed_types: Optional[set] = None) -> Optional[Tuple[str, str]]:
+    """Find first matching property name in schema (optional type filter)."""
+    for name in candidates:
+        if name in schema:
+            ptype = schema[name]
+            if allowed_types is None or ptype in allowed_types:
+                return name, ptype
+    # Also try case-insensitive match against actual schema keys
+    lower_map = {k.lower(): k for k in schema}
+    for name in candidates:
+        key = lower_map.get(name.lower())
+        if key:
+            ptype = schema[key]
+            if allowed_types is None or ptype in allowed_types:
+                return key, ptype
+    return None
+
+
+def _build_properties(
+    result: Dict[str, Any],
+    title: str,
+    now: str,
+    schema: Dict[str, str],
+) -> Dict[str, Any]:
+    properties: Dict[str, Any] = {}
+
+    # Title
+    title_match = _find_prop(schema, TITLE_CANDIDATES, {"title"})
+    if title_match:
+        prop_name, _ = title_match
+        properties[prop_name] = {
             "title": [{"text": {"content": _truncate(title, 2000)}}]
-        },
-        "Processing Date": {
-            "date": {"start": now}
-        },
-    }
-
-    # Source Files — use GitHub raw URL as a file attachment
-    source_file = result.get("source_file", "")
-    if source_file:
-        raw_url = f"{GITHUB_RAW_BASE}{source_file}"
-        properties["Source Files"] = {
-            "files": [
-                {
-                    "name": source_file,
-                    "type": "external",
-                    "external": {"url": raw_url}
-                }
-            ]
         }
-        logger.info("Source Files URL: %s", raw_url)
     else:
-        # Fallback: empty files array if no source file
-        properties["Source Files"] = {"files": []}
+        # Notion always has a title property; fall back to common name
+        properties["Name"] = {
+            "title": [{"text": {"content": _truncate(title, 2000)}}]
+        }
+
+    # Source file
+    source_file = result.get("source_file") or ""
+    source_match = _find_prop(schema, SOURCE_CANDIDATES, {"files", "rich_text", "url"})
+    if source_match and source_file:
+        prop_name, ptype = source_match
+        if ptype == "files":
+            # External file URL — works for remote links; local paths cannot be uploaded via API without multipart
+            # Use a placeholder external URL that encodes the filename for traceability
+            properties[prop_name] = {
+                "files": [
+                    {
+                        "name": source_file[:100],
+                        "type": "external",
+                        "external": {
+                            "url": f"https://studyforge.local/source/{source_file}"
+                        },
+                    }
+                ]
+            }
+        elif ptype == "url":
+            properties[prop_name] = {"url": f"https://studyforge.local/source/{source_file}"}
+        else:
+            properties[prop_name] = {
+                "rich_text": [{"text": {"content": _truncate(source_file, 2000)}}]
+            }
+
+    # Processing date
+    date_match = _find_prop(schema, DATE_CANDIDATES, {"date"})
+    if date_match:
+        prop_name, _ = date_match
+        properties[prop_name] = {"date": {"start": now}}
 
     return properties
 
 
 def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Build Notion blocks from study result."""
     blocks: List[Dict[str, Any]] = []
 
-    # Standard sections (plain text body)
     for heading, key in [
         ("Summary", "summary"),
         ("Key Points", "key_points"),
@@ -171,11 +200,9 @@ def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
         for chunk in _chunk_text(content, 1800):
             blocks.append(_paragraph(chunk))
 
-    # Color-coded segments with Notion colors
     segments = result.get("color_segments") or []
     if segments:
         blocks.append(_heading2("Color-Coded Notes"))
-        # Legend
         blocks.append(
             _paragraph(
                 "Semantic colors mapped to nearest Notion-supported colors. "
@@ -189,11 +216,9 @@ def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
                 hex_color = f"#{hex_color}"
             category = seg.get("category") or "Standard Notes"
             text = seg.get("text") or ""
-            notion_color = HEX_TO_NOTION_COLOR.get(hex_color, "default")
-            notion_color = _validate_notion_color(notion_color)
+            notion_color = _validate_notion_color(HEX_TO_NOTION_COLOR.get(hex_color, "default"))
 
             label = f"[{hex_color} · {category}] "
-            # Label in gray, body in mapped color
             blocks.append(
                 {
                     "object": "block",
@@ -238,7 +263,6 @@ def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
                 }
             )
     elif result.get("color_coded_raw"):
-        # Fallback if structured segments missing
         blocks.append(_heading2("Color-Coded Notes"))
         for chunk in _chunk_text(result["color_coded_raw"], 1800):
             blocks.append(_paragraph(chunk))
@@ -247,7 +271,6 @@ def _build_blocks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def _heading2(text: str) -> Dict[str, Any]:
-    """Create a heading_2 block."""
     return {
         "object": "block",
         "type": "heading_2",
@@ -259,7 +282,6 @@ def _heading2(text: str) -> Dict[str, Any]:
 
 
 def _paragraph(text: str, color: str = "default") -> Dict[str, Any]:
-    """Create a paragraph block with optional color."""
     color = _validate_notion_color(color)
     return {
         "object": "block",
@@ -285,23 +307,20 @@ def _paragraph(text: str, color: str = "default") -> Dict[str, Any]:
 
 
 def _validate_notion_color(color: str) -> str:
-    """Ensure the color is a valid Notion color string."""
     if color in VALID_NOTION_COLORS:
         return color
     return "default"
 
 
 def _chunk_text(text: str, size: int) -> List[str]:
-    """Split text into chunks of roughly `size` characters."""
     if not text:
         return []
-    return [text[i: i + size] for i in range(0, len(text), size)]
+    return [text[i : i + size] for i in range(0, len(text), size)]
 
 
 def _truncate(text: str, max_len: int) -> str:
-    """Truncate text to max_len with ellipsis."""
     if not text:
         return ""
     if len(text) <= max_len:
         return text
-    return text[:max_len - 1] + "…"
+    return text[: max_len - 1] + "…"

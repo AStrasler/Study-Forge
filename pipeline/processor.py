@@ -32,7 +32,6 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
     if not text.strip():
         raise ValueError(f"No extractable text in {path.name}")
 
-    # Specialized agents
     summary = summarizer.run(text, manager)
     points = key_points.run(text, manager)
     cards = flashcards.run(text, manager)
@@ -45,10 +44,7 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
         "definitions": defs.text,
     }
 
-    # Judge / synthesis
     synthesized = judge.run(agent_outputs, manager)
-
-    # Color classification → structured segments
     colored_response, color_segments = color_coder.run(synthesized.text, manager)
 
     result: Dict[str, Any] = {
@@ -64,23 +60,23 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
         "processed_at": datetime.now(timezone.utc).isoformat(),
     }
 
-    # Always persist locally first (Notion must not be the only copy)
     local_path = _save_local_result(result, settings)
     result["local_result_path"] = str(local_path)
     logger.info("Saved local result: %s", local_path)
 
-    # Notion output (optional — only if configured)
     if settings.notion_api_token and settings.notion_database_id:
         try:
             from output.notion import push_to_notion
 
-            push_to_notion(result, settings)
-            result["notion_pushed"] = True
+            ok = push_to_notion(result, settings)
+            result["notion_pushed"] = bool(ok)
+            if not ok:
+                result["notion_error"] = "push_to_notion returned False"
+                _save_local_result(result, settings)
         except Exception as exc:
             logger.error("Notion push failed for %s: %s", path.name, exc)
             result["notion_pushed"] = False
             result["notion_error"] = str(exc)
-            # Re-save so notion_error is recorded
             _save_local_result(result, settings)
     else:
         result["notion_pushed"] = False
@@ -90,7 +86,6 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
 
 
 def _save_local_result(result: Dict[str, Any], settings: Settings) -> Path:
-    """Write JSON + readable Markdown into the output folder."""
     out_dir = Path(settings.output_folder)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -136,7 +131,6 @@ def _save_local_result(result: Dict[str, Any], settings: Settings) -> Path:
 
 
 def process_input_folder(settings: Settings) -> List[Dict[str, Any]]:
-    """Process every supported file in the input folder sequentially."""
     manager = ProviderManager(settings)
     input_dir = Path(settings.input_folder)
     results: List[Dict[str, Any]] = []
@@ -166,12 +160,6 @@ def process_input_folder(settings: Settings) -> List[Dict[str, Any]]:
             )
         except Exception as exc:
             logger.error("Failed to process %s: %s", path.name, exc)
-            results.append(
-                {
-                    "source_file": path.name,
-                    "error": str(exc),
-                }
-            )
-            # Continue with remaining files
+            results.append({"source_file": path.name, "error": str(exc)})
 
     return results
