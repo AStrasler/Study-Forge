@@ -1,0 +1,13 @@
+# Study Forge — Cloudflare Worker + R2 + D1
+name = "study-forge-api"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "studyforge"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "studyforge-db"
+database_id = "REPLACE_AFTER_CREATE"
