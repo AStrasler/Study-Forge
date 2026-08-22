@@ -16,4 +16,4 @@ bucket_name = "studyforge"
 [[d1_databases]]
 binding = "DB"
 database_name = "studyforge-db"
-database_id = "REPLACE_AFTER_CREATE"
+database_id = "5f17ed68-d325-46b9-8de7-3e19f943a960"
