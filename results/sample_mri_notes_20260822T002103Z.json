@@ -1,0 +1,98 @@
+{
+  "source_file": "sample_mri_notes.txt",
+  "summary": "Here is a concise summary of the MRI Safety Lecture Notes:\n\nThe lecture covers several key safety topics related to Magnetic Resonance Imaging (MRI):\n\n1. **Static Magnetic Field Hazards**: The risk of ferromagnetic objects becoming projectiles in the magnetic field.\n2. **Gradient Field Risks**: Not mentioned in the provided notes.\n3. **RF Heating and SAR (Specific Absorbed Radiation)**: The importance of SAR limits in protecting against tissue heating.\n4. **Contraindications for Implants**: Patients with certain pacemakers must not enter the MRI suite due to potential harm.\n\nAdditionally, the professor emphasizes the importance of verifying implant compatibility before scanning.",
+  "key_points": "Here are the key points extracted from the MRI Safety Lecture Notes:\n\n1. Certain pacemakers require patients to be excluded from the MRI suite due to the static magnetic field hazards.\n2. Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and staff.\n3. The Specialized Apparatus Limitation (SAR) limits protect against tissue heating caused by radiofrequency (RF) heating.\n4. Patients with implants require special consideration and verification of implant compatibility before scanning.\n5. Verification of implant compatibility is crucial to ensure patient safety during MRI scanning.",
+  "flashcards": "Here are the flashcards based on the study material:\n\n**Card 1**\nQ: What type of objects can become projectiles in an MRI suite?\nA: Ferromagnetic objects\n\n**Card 2**\nQ: What safety limit is in place to prevent tissue heating in patients?\nA: SAR (Specific Absorption Rate) limits\n\n**Card 3**\nQ: What should be verified before scanning a patient with an implant?\nA: Implant compatibility\n\n**Card 4**\nQ: What is a critical consideration for patients with certain pacemakers in an MRI suite?\nA: They must not enter the MRI suite\n\n**Card 5**\nQ: What type of objects can be hazardous in an MRI suite?\nA: Ferromagnetic objects",
+  "definitions": "Here are the key terms and their definitions extracted from the study material:\n\nTerm: Static magnetic field hazards\nDefinition: Not explicitly defined, but it refers to the risks associated with the magnetic field present in an MRI environment.\n\nTerm: Gradient field risks\nDefinition: Not explicitly defined, but it refers to the risks associated with the magnetic field gradients used in MRI to provide spatial resolution.\n\nTerm: RF heating and SAR\nDefinition: SAR (Specific Absorption Rate) limits: The maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy. \n\nTerm: Contraindications for implants\nDefinition: Patients with certain pacemakers that are not compatible with the MRI environment, and ferromagnetic objects that can become projectiles in the magnetic field, are not allowed to enter the MRI suite.\n\nNote: The definitions for Static magnetic field hazards and Gradient field risks are not explicitly stated in the provided material, so they are not included in the list.",
+  "synthesized": "Here is the synthesized study package:\n\n**Brief Summary:**\nThis study package provides key information on MRI safety, including risks associated with the magnetic field, RF heating, and contraindications for implants. It emphasizes the importance of verifying implant compatibility and following specific absorption rate (SAR) limits to prevent tissue heating.\n\n**Key Points:**\n\n1. **MRI Safety Considerations:**\n\t* Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and staff.\n\t* Certain pacemakers require patients to be excluded from the MRI suite due to potential harm.\n\t* SAR limits protect against tissue heating caused by radiofrequency (RF) heating.\n\t* Patients with implants require special consideration and verification of implant compatibility before scanning.\n2. **Implant Compatibility:**\n\t* Verification of implant compatibility is crucial to ensure patient safety during MRI scanning.\n3. **Risks and Precautions:**\n\t* Static magnetic field hazards: potential risks associated with the magnetic field present in an MRI environment.\n\t* RF heating and SAR limits: maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.\n\n**Definitions:**\n\n1. **SAR (Specific Absorption Rate) limits:** The maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.\n2. **Contraindications for implants:** Patients with certain pacemakers that are not compatible with the MRI environment, and ferromagnetic objects that can become projectiles in the magnetic field, are not allowed to enter the MRI suite.\n\n**Flashcards:**\n\n* Q: What type of objects can become projectiles in an MRI suite? A: Ferromagnetic objects\n* Q: What safety limit is in place to prevent tissue heating in patients? A: SAR (Specific Absorption Rate) limits\n* Q: What should be verified before scanning a patient with an implant? A: Implant compatibility\n* Q: What is a critical consideration for patients with certain pacemakers in an MRI suite? A: They must not enter the MRI suite",
+  "color_coded_raw": "[\n  {\n    \"text\": \"Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and staff.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"Certain pacemakers require patients to be excluded from the MRI suite due to potential harm.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"SAR limits protect against tissue heating caused by radiofrequency (RF) heating.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"Patients with implants require special consideration and verification of implant compatibility before scanning.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Verification of implant compatibility is crucial to ensure patient safety during MRI scanning.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Static magnetic field hazards: potential risks associated with the magnetic field present in an MRI environment.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"RF heating and SAR limits: maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"SAR (Specific Absorption Rate) limits: The maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.\",\n    \"color\": \"#800080\",\n    \"category\": \"Physics / Math / Formulas\"\n  },\n  {\n    \"text\": \"Contraindications for implants: Patients with certain pacemakers that are not compatible with the MRI environment, and ferromagnetic objects that can become projectiles in the magnetic field, are not allowed to enter the MRI suite.\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"What type of objects can become projectiles in an MRI suite?\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"What safety limit is in place to prevent tissue heating in patients?\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"What should be verified before scanning a patient with an implant?\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"What is a critical consideration for patients with certain pacemakers in an MRI suite?\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Q: What type of objects can become projectiles in an MRI suite? A: Ferromagnetic objects\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Q: What safety limit is in place to prevent tissue heating in patients? A: SAR (Specific Absorption Rate) limits\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Q: What should be verified before scanning a patient with an implant? A: Implant compatibility\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Q: What is a critical consideration for patients with certain pacemakers in an MRI suite? A: They must not enter the MRI suite\",\n    \"color\": \"#FF69B4\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  }\n]",
+  "color_segments": [
+    {
+      "text": "Ferromagnetic objects can become projectiles in the magnetic field, posing a risk to patients and staff.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "Certain pacemakers require patients to be excluded from the MRI suite due to potential harm.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "SAR limits protect against tissue heating caused by radiofrequency (RF) heating.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "Patients with implants require special consideration and verification of implant compatibility before scanning.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Verification of implant compatibility is crucial to ensure patient safety during MRI scanning.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Static magnetic field hazards: potential risks associated with the magnetic field present in an MRI environment.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "RF heating and SAR limits: maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "SAR (Specific Absorption Rate) limits: The maximum amount of heat that can be absorbed by the body when exposed to radiofrequency (RF) energy.",
+      "color": "#800080",
+      "category": "Physics / Math / Formulas"
+    },
+    {
+      "text": "Contraindications for implants: Patients with certain pacemakers that are not compatible with the MRI environment, and ferromagnetic objects that can become projectiles in the magnetic field, are not allowed to enter the MRI suite.",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "What type of objects can become projectiles in an MRI suite?",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "What safety limit is in place to prevent tissue heating in patients?",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "What should be verified before scanning a patient with an implant?",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "What is a critical consideration for patients with certain pacemakers in an MRI suite?",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What type of objects can become projectiles in an MRI suite? A: Ferromagnetic objects",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What safety limit is in place to prevent tissue heating in patients? A: SAR (Specific Absorption Rate) limits",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What should be verified before scanning a patient with an implant? A: Implant compatibility",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    },
+    {
+      "text": "Q: What is a critical consideration for patients with certain pacemakers in an MRI suite? A: They must not enter the MRI suite",
+      "color": "#FF69B4",
+      "category": "Clinical Red Flags / Contraindications / Safety"
+    }
+  ],
+  "provider_used": "ollama",
+  "processed_at": "2026-08-22T00:21:03.325159+00:00"
+}
