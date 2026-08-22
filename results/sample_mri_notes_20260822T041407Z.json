@@ -1,0 +1,73 @@
+{
+  "source_file": "sample_mri_notes.txt",
+  "summary": "Here is a concise summary of the MRI Safety Lecture Notes:\n\nThe lecture covers the following main topics:\n\n1. Static magnetic field hazards\n2. Gradient field risks\n3. RF heating and SAR (Specific Absorption Rate) limits\n4. Contraindications for implants\n\nKey safety points include:\n\n* Certain pacemakers are contraindicated for use in the MRI suite\n* Ferromagnetic objects can pose a risk to patients\n* SAR limits protect against tissue heating and tissue damage\n\nThe professor's tip emphasizes the importance of verifying implant compatibility before scanning to ensure patient safety.",
+  "key_points": "Here are the 7 key points extracted from the study material:\n\n1. Patients with certain pacemakers should not enter the MRI suite.\n2. Ferromagnetic objects can become projectiles in the strong magnetic field of an MRI machine.\n3. The strong radiofrequency (RF) fields of an MRI can cause heating in tissues (RF heating), which is limited by the Specific Absorption Rate (SAR) limits.\n4. SAR limits are in place to protect against tissue heating caused by RF exposure.\n5. Before scanning, always verify the compatibility of implants with the MRI machine to prevent safety risks.\n6. Certain patients may have contraindications for MRI scanning due to the risks associated with the strong magnetic fields.\n7. The static magnetic field of an MRI machine poses hazards, but specific details about these hazards are not mentioned in the provided study material.",
+  "flashcards": "Here are the flashcards based on the provided material:\n\nQ: What type of objects should not be brought into the MRI suite due to potential hazards?\nA: Ferromagnetic objects\n\nQ: What can ferromagnetic objects in the presence of a static magnetic field become?\nA: Projectiles\n\nQ: What safety measure helps protect against RF heating in the body?\nA: SAR (Specific Absorption Rate) limits\n\nQ: What should a healthcare professional consider before scanning a patient with an implant?\nA: Implant compatibility and compatibility verification\n\nQ: What should be avoided for patients with certain pacemakers to ensure safe MRI scanning?\nA: Entering the MRI suite",
+  "definitions": "Here are the key terms and their definitions extracted from the study material:\n\nTerm: SAR definition\nSAR stands: Specific Absorption Rate\n\nTerm: RF definition\nRF stands: Radio Frequency\n\nTerm: Ferromagnetic definition\nFerromagnetic: A type of material that is strongly attracted to magnets, such as iron, nickel, and cobalt, which can become projectiles in the magnetic field of an MRI.",
+  "synthesized": "**Comprehensive MRI Safety Study Package**\n\n**Summary**\nThis study package provides essential information on MRI safety, covering static magnetic field hazards, gradient field risks, RF heating and SAR limits, and contraindications for implants.\n\n**Key Points**\n\n1. Certain pacemakers are contraindicated for use in the MRI suite.\n2. Ferromagnetic objects can pose a risk to patients, becoming projectiles in the strong magnetic field of an MRI machine.\n3. SAR limits protect against tissue heating and tissue damage caused by RF exposure.\n4. Verify implant compatibility before scanning to prevent safety risks.\n5. Certain patients may have contraindications for MRI scanning due to the risks associated with the strong magnetic fields.\n6. The static magnetic field poses hazards, but specific details are not mentioned.\n\n**Essential Definitions**\n\n1. **SAR (Specific Absorption Rate)**: A safety measure that limits RF heating in the body.\n2. **RF (Radio Frequency)**: A type of energy emitted by MRI machines, posing heating risks to tissues.\n3. **Ferromagnetic**: A type of material strongly attracted to magnets, posing projectile risks in MRI machines.\n\n**Flashcards**\n\n* Q: What type of objects should not be brought into the MRI suite? A: Ferromagnetic objects.\n* Q: What should a healthcare professional verify before scanning a patient with an implant? A: Implant compatibility and compatibility verification.\n\nThis comprehensive study package provides a concise overview of MRI safety, emphasizing the importance of verifying implant compatibility, SAR limits, and the risks associated with ferromagnetic objects and strong magnetic fields.",
+  "color_coded_raw": "[\n  {\n    \"text\": \"This study package provides essential information on MRI safety, covering static magnetic field hazards, gradient field risks, RF heating and SAR limits, and contraindications for implants.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"Certain pacemakers are contraindicated for use in the MRI suite.\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Ferromagnetic objects can pose a risk to patients, becoming projectiles in the strong magnetic field of an MRI machine.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"SAR limits protect against tissue heating and tissue damage caused by RF exposure.\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Verify implant compatibility before scanning to prevent safety risks.\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"Certain patients may have contraindications for MRI scanning due to the risks associated with the strong magnetic fields.\",\n    \"color\": \"#FF0000\",\n    \"category\": \"Clinical Red Flags / Contraindications / Safety\"\n  },\n  {\n    \"text\": \"The static magnetic field poses hazards, but specific details are not mentioned.\",\n    \"color\": \"#000080\",\n    \"category\": \"Anatomical Structures / Pathologies\"\n  },\n  {\n    \"text\": \"SAR (Specific Absorption Rate): A safety measure that limits RF heating in the body.\",\n    \"color\": \"#800080\",\n    \"category\": \"Physics / Math / Formulas\"\n  },\n  {\n    \"text\": \"RF (Radio Frequency): A type of energy emitted by MRI machines, posing heating risks to tissues.\",\n    \"color\": \"#800080\",\n    \"category\": \"Physics / Math / Formulas\"\n  },\n  {\n    \"text\": \"Ferromagnetic: A type of material strongly attracted to magnets, posing projectile risks in MRI machines.\",\n    \"color\": \"#800080\",\n    \"category\": \"Physics / Math / Formulas\"\n  },\n  {\n    \"text\": \"Q: What type of objects should not be brought into the MRI suite? A: Ferromagnetic objects.\",\n    \"color\": \"#0000FF\",\n    \"category\": \"Standard Notes\"\n  },\n  {\n    \"text\": \"Q: What should a healthcare professional verify before scanning a patient with an implant? A: Implant compatibility and compatibility verification.\",\n    \"color\": \"#0000FF\",\n    \"category\": \"Standard Notes\"\n  }\n]",
+  "color_segments": [
+    {
+      "text": "This study package provides essential information on MRI safety, covering static magnetic field hazards, gradient field risks, RF heating and SAR limits, and contraindications for implants.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "Certain pacemakers are contraindicated for use in the MRI suite.",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "Ferromagnetic objects can pose a risk to patients, becoming projectiles in the strong magnetic field of an MRI machine.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "SAR limits protect against tissue heating and tissue damage caused by RF exposure.",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "Verify implant compatibility before scanning to prevent safety risks.",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "Certain patients may have contraindications for MRI scanning due to the risks associated with the strong magnetic fields.",
+      "color": "#FF0000",
+      "category": "Corrections / Professor Emphasis"
+    },
+    {
+      "text": "The static magnetic field poses hazards, but specific details are not mentioned.",
+      "color": "#000080",
+      "category": "Anatomical Structures / Pathologies"
+    },
+    {
+      "text": "SAR (Specific Absorption Rate): A safety measure that limits RF heating in the body.",
+      "color": "#800080",
+      "category": "Physics / Math / Formulas"
+    },
+    {
+      "text": "RF (Radio Frequency): A type of energy emitted by MRI machines, posing heating risks to tissues.",
+      "color": "#800080",
+      "category": "Physics / Math / Formulas"
+    },
+    {
+      "text": "Ferromagnetic: A type of material strongly attracted to magnets, posing projectile risks in MRI machines.",
+      "color": "#800080",
+      "category": "Physics / Math / Formulas"
+    },
+    {
+      "text": "Q: What type of objects should not be brought into the MRI suite? A: Ferromagnetic objects.",
+      "color": "#0000FF",
+      "category": "Standard Notes"
+    },
+    {
+      "text": "Q: What should a healthcare professional verify before scanning a patient with an implant? A: Implant compatibility and compatibility verification.",
+      "color": "#0000FF",
+      "category": "Standard Notes"
+    }
+  ],
+  "provider_used": "ollama",
+  "processed_at": "2026-08-22T04:14:07.191342+00:00"
+}
