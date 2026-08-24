@@ -2,298 +2,219 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Study Forge</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#0B0D10;--surface:#14171C;--surface2:#1B1F26;--border:#262B33;--ember:#FF7A33;--ember-soft:rgba(255,122,51,.14);--steel:#5EA8FF;--green:#4ADE80;--green-soft:rgba(74,222,128,.14);--red:#F87171;--red-soft:rgba(248,113,113,.14);--bone:#EDEEF0;--slate:#8A909B;--dim:#5B616C}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--ink);color:var(--bone);font-family:Inter,sans-serif;min-height:100vh}
-.display{font-family:Space Grotesk,sans-serif}.mono{font-family:JetBrains Mono,monospace}
-button{font-family:inherit;cursor:pointer;border:none}
-#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.card-login{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:36px 32px;text-align:center}
-.card-login h1{font-size:22px;margin:16px 0 6px}.card-login .sub{color:var(--slate);font-size:13px;margin-bottom:24px}
-.field{text-align:left;margin-bottom:12px}
-.field label{display:block;font-size:11px;color:var(--slate);margin-bottom:6px;text-transform:uppercase}
-.field input{width:100%;background:var(--ink);border:1px solid var(--border);border-radius:9px;padding:11px 12px;color:var(--bone);font-size:14px}
-.btn{background:linear-gradient(180deg,var(--ember),#E5601C);color:#1a0900;font-weight:600;border-radius:9px;padding:12px;width:100%;margin-top:8px;font-size:14px}
-.btn-sm{padding:8px 12px;font-size:12px;border-radius:8px;width:auto}
-.btn-ghost{background:var(--surface2);color:var(--bone);border:1px solid var(--border)}
-.btn-danger{background:var(--red-soft);color:var(--red);border:1px solid rgba(248,113,113,.35)}
-#app{display:none;min-height:100vh}
-#app.on{display:flex}
-.side{width:220px;background:#0F1216;border-right:1px solid #1E222A;padding:20px 14px;display:flex;flex-direction:column}
-.side .brand{font-weight:700;font-size:16px;margin-bottom:20px;padding:0 8px}
-.nav{display:block;width:100%;text-align:left;background:transparent;color:var(--slate);padding:10px;border-radius:8px;margin-bottom:4px;font-size:13px}
-.nav.on{background:var(--ember-soft);color:var(--bone)}
-.main{flex:1;min-width:0}
-.top{height:56px;border-bottom:1px solid #1E222A;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
-.chip{font-size:11px;font-weight:600;padding:5px 10px;border-radius:99px;background:var(--green-soft);color:var(--green)}
-.chip.bad{background:var(--red-soft);color:var(--red)}
-.content{padding:28px 24px;max-width:960px}
-.h1{font-size:24px;margin-bottom:6px}.p{color:var(--slate);font-size:14px;margin-bottom:20px}
-.panel{background:var(--surface);border:1px solid #1E222A;border-radius:14px;padding:20px;margin-bottom:16px}
-.panel h2{font-size:14px;margin-bottom:14px}
-.drop{border:1.5px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer}
-.drop:hover{border-color:var(--ember);background:var(--ember-soft)}
-.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1E222A}
-.row:last-child{border-bottom:none}.row.go{cursor:pointer}
-.st{font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 8px;border-radius:99px}
-.st.queued{background:#1B1F26;color:var(--slate)}
-.st.forging{background:var(--ember-soft);color:var(--ember)}
-.st.forged{background:var(--green-soft);color:var(--green)}
-.st.failed{background:var(--red-soft);color:var(--red)}
-.fname{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.err{font-size:11px;color:var(--red);margin-top:4px}
-.notes{white-space:pre-wrap;font-size:13.5px;line-height:1.65}
-.meta{font-size:12px;color:var(--dim);margin-bottom:12px}
-.view{display:none}.view.on{display:block}
-.foot{font-size:12px;color:var(--dim);text-align:center;margin-top:12px}
+body{margin:0;font-family:system-ui,sans-serif;background:#0B0D10;color:#EDEEF0;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:24px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:#8A909B;font-size:14px;margin-bottom:20px}
+.box{background:#14171C;border:1px solid #262B33;border-radius:12px;padding:16px;margin-bottom:16px}
+.drop{border:1px dashed #262B33;border-radius:8px;padding:28px;text-align:center;cursor:pointer;color:#8A909B}
+.drop:hover{border-color:#FF7A33}
+.row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #1E222A;font-size:13px}
+.row:last-child{border:0}
+.st{font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:#1B1F26;color:#8A909B}
+.st.forged{background:rgba(74,222,128,.14);color:#4ADE80}
+.st.forging{background:rgba(255,122,51,.14);color:#FF7A33}
+.st.failed{background:rgba(248,113,113,.14);color:#F87171}
+button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:600}
+.primary{background:#FF7A33;color:#1a0900}
+.ghost{background:#1B1F26;color:#EDEEF0;border:1px solid #262B33}
+.danger{background:rgba(248,113,113,.14);color:#F87171}
+.notes{white-space:pre-wrap;font-size:14px;line-height:1.6}
+.meta{color:#5B616C;font-size:12px;margin:8px 0}
+.chip{display:inline-block;font-size:12px;padding:4px 10px;border-radius:99px;background:rgba(74,222,128,.14);color:#4ADE80}
+.chip.bad{background:rgba(248,113,113,.14);color:#F87171}
+#login{max-width:360px;margin:80px auto;padding:24px}
+#app{display:none}
 </style>
 </head>
 <body>
-<div id="login">
-  <div class="card-login">
-    <div class="brand display" style="font-size:18px">Study Forge</div>
-    <h1 class="display">Enter your instance</h1>
-    <p class="sub">Cloud · Groq BYOK · notes on screen</p>
-    <div class="field"><label>Username</label><input id="user" type="text" placeholder="you"></div>
-    <div class="field"><label>Password</label><input id="pass" type="password" placeholder="••••••••"></div>
-    <button class="btn" type="button" id="btn-enter">Enter the forge</button>
-  </div>
+
+<div id="login" class="box">
+  <h1>Study Forge</h1>
+  <p class="sub">Cloud queue · notes on screen · copy to Notion yourself</p>
+  <button class="primary" type="button" id="go" style="width:100%">Enter the forge</button>
 </div>
 
-<div id="app">
-  <aside class="side">
-    <div class="brand display">Study Forge</div>
-    <button type="button" class="nav on" data-v="overview">Overview</button>
-    <button type="button" class="nav" data-v="history">Upload history</button>
-    <button type="button" class="nav" data-v="notes">Notes</button>
-  </aside>
-  <div class="main">
-    <div class="top">
-      <span class="mono" id="host">studyforge.studio</span>
-      <span class="chip" id="chip">API…</span>
+<div id="app" class="wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h1>Study Forge</h1>
+    <span class="chip" id="chip">…</span>
+  </div>
+  <p class="sub" id="hint"></p>
+
+  <div class="box">
+    <div class="drop" id="drop">Drop .txt / .md or click to upload
+      <input type="file" id="file" accept=".txt,.md,.markdown" hidden>
     </div>
-    <div class="content">
-      <div class="view on" id="v-overview">
-        <h1 class="h1 display">Welcome back.</h1>
-        <p class="p">Upload a .txt → forge on Cloudflare → open notes → copy to Notion yourself.</p>
-        <div class="panel">
-          <h2>Upload</h2>
-          <div class="drop" id="drop">Drop .txt / .md or click to browse
-            <input type="file" id="file" accept=".txt,.md,.markdown" hidden>
-          </div>
-        </div>
-        <div class="panel">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h2 style="margin:0">Queue</h2>
-            <button type="button" class="btn-sm btn-danger" id="btn-clear">Clear failed</button>
-          </div>
-          <div id="queue">Loading…</div>
-        </div>
-      </div>
-      <div class="view" id="v-history">
-        <h1 class="h1 display">Upload history</h1>
-        <p class="p">Persists in D1. Click forged jobs to open notes.</p>
-        <div class="panel"><div id="history">Loading…</div></div>
-      </div>
-      <div class="view" id="v-notes">
-        <h1 class="h1 display">Notes</h1>
-        <div class="panel">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-            <h2 style="margin:0" id="notes-title">No notes open</h2>
-            <button type="button" class="btn-sm btn-ghost" id="btn-copy">Copy all</button>
-          </div>
-          <div class="meta" id="notes-meta"></div>
-          <div class="notes" id="notes-body"></div>
-        </div>
-      </div>
-      <p class="foot" id="hint"></p>
+  </div>
+
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Queue / history</strong>
+      <button type="button" class="danger" id="clear">Clear failed</button>
     </div>
+    <div id="list">Loading…</div>
+  </div>
+
+  <div class="box" id="notesBox" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong id="notesTitle">Notes</strong>
+      <button type="button" class="ghost" id="copy">Copy all</button>
+    </div>
+    <div class="meta" id="notesMeta"></div>
+    <div class="notes" id="notesBody"></div>
   </div>
 </div>
 
 <script>
-(function () {
-  var API = localStorage.getItem("sf_api_base") || "https://study-forge.aaron-m-strasler.workers.dev";
-  var poll = null;
+var API = localStorage.getItem("sf_api_base") || "https://study-forge.aaron-m-strasler.workers.dev";
 
-  document.getElementById("host").textContent = location.hostname || "studyforge.studio";
+document.getElementById("go").onclick = async function () {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  await ping();
+  await refresh();
+  setInterval(refresh, 4000);
+};
 
-  function $(id) { return document.getElementById(id); }
-
-  function show(name) {
-    document.querySelectorAll(".view").forEach(function (el) { el.classList.remove("on"); });
-    document.querySelectorAll(".nav").forEach(function (el) { el.classList.remove("on"); });
-    var v = $("v-" + name);
-    if (v) v.classList.add("on");
-    document.querySelectorAll(".nav").forEach(function (el) {
-      if (el.getAttribute("data-v") === name) el.classList.add("on");
-    });
-    if (name === "overview" || name === "history") refresh();
+async function ping() {
+  var chip = document.getElementById("chip");
+  var hint = document.getElementById("hint");
+  try {
+    var res = await fetch(API + "/api/health");
+    var data = await res.json();
+    if (!data.ok) throw new Error("bad");
+    chip.className = "chip";
+    chip.textContent = data.groq ? "API + Groq" : "API up · need GROQ secret";
+    hint.textContent = "API " + API;
+  } catch (e) {
+    chip.className = "chip bad";
+    chip.textContent = "API offline";
+    hint.textContent = "Cannot reach " + API;
   }
+}
 
-  document.querySelectorAll(".nav").forEach(function (btn) {
-    btn.addEventListener("click", function () { show(btn.getAttribute("data-v")); });
-  });
+var drop = document.getElementById("drop");
+var file = document.getElementById("file");
+drop.onclick = function () { file.click(); };
+drop.ondragover = function (e) { e.preventDefault(); };
+drop.ondrop = function (e) {
+  e.preventDefault();
+  if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
+};
+file.onchange = function () {
+  if (file.files[0]) upload(file.files[0]);
+};
 
-  $("btn-enter").addEventListener("click", enter);
-  $("pass").addEventListener("keydown", function (e) { if (e.key === "Enter") enter(); });
+document.getElementById("clear").onclick = async function () {
+  if (!confirm("Clear failed jobs?")) return;
+  await fetch(API + "/api/jobs/clear-failed", { method: "POST" });
+  refresh();
+};
 
-  async function enter() {
-    $("login").style.display = "none";
-    $("app").classList.add("on");
-    await health();
-    await refresh();
-    if (poll) clearInterval(poll);
-    poll = setInterval(refresh, 4000);
+document.getElementById("copy").onclick = async function () {
+  var t = document.getElementById("notesBody").innerText;
+  if (!t) return;
+  try {
+    await navigator.clipboard.writeText(t);
+    alert("Copied");
+  } catch (e) {
+    alert("Copy manually");
   }
+};
 
-  async function health() {
-    var chip = $("chip");
-    try {
-      var res = await fetch(API + "/api/health");
-      var data = await res.json();
-      if (!res.ok || !data.ok) throw new Error("bad");
-      chip.className = "chip";
-      chip.textContent = data.groq ? "API + Groq ready" : "API up · set GROQ secret";
-      $("hint").textContent = "API: " + API + (data.groq ? "" : " — run: wrangler secret put GROQ_API_KEY");
-    } catch (e) {
-      chip.className = "chip bad";
-      chip.textContent = "API offline";
-      $("hint").textContent = "Tried " + API + " — check Worker deploy";
-    }
-  }
-
-  var drop = $("drop");
-  var file = $("file");
-  drop.addEventListener("click", function () { file.click(); });
-  drop.addEventListener("dragover", function (e) { e.preventDefault(); });
-  drop.addEventListener("drop", function (e) {
-    e.preventDefault();
-    if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
-  });
-  file.addEventListener("change", function () {
-    if (file.files[0]) upload(file.files[0]);
-  });
-
-  $("btn-clear").addEventListener("click", async function () {
-    if (!confirm("Delete all failed jobs?")) return;
-    await fetch(API + "/api/jobs/clear-failed", { method: "POST" });
-    refresh();
-  });
-
-  $("btn-copy").addEventListener("click", async function () {
-    var t = $("notes-body").innerText;
-    if (!t) { alert("No notes"); return; }
-    try {
-      await navigator.clipboard.writeText(t);
-      alert("Copied — paste into Notion");
-    } catch (e) {
-      alert("Select text and copy manually");
-    }
-  });
-
-  async function upload(f) {
-    var form = new FormData();
-    form.append("file", f);
-    try {
-      var res = await fetch(API + "/api/jobs", { method: "POST", body: form });
-      var data = await res.json().catch(function () { return {}; });
-      if (!res.ok) {
-        alert(data.error || ("Upload failed: " + res.status));
-        return;
-      }
-      await refresh();
-      show("overview");
-    } catch (e) {
-      alert("Upload error: " + (e.message || e));
-    } finally {
-      file.value = "";
-    }
-  }
-
-  window.dismissJob = async function (id) {
-    await fetch(API + "/api/jobs/" + id, { method: "DELETE" });
-    refresh();
-  };
-
-  window.openNotes = async function (id, name) {
-    show("notes");
-    $("notes-title").textContent = "Loading…";
-    $("notes-body").textContent = "";
-    var res = await fetch(API + "/api/jobs/" + id + "/result");
+async function upload(f) {
+  var fd = new FormData();
+  fd.append("file", f);
+  try {
+    var res = await fetch(API + "/api/jobs", { method: "POST", body: fd });
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok) {
-      $("notes-title").textContent = name || "Notes";
-      $("notes-meta").textContent = data.error || data.detail || "No notes";
+      alert(data.error || ("Upload failed " + res.status));
       return;
     }
-    var n = data.notes || {};
-    $("notes-title").textContent = name || n.source_file || "Notes";
-    $("notes-meta").textContent = (n.provider_used || "groq") + " · " + (n.processed_at || "");
-    $("notes-body").textContent = n.full_notes || [n.summary, n.key_points, n.definitions, n.flashcards, n.synthesized].filter(Boolean).join("\n\n");
-  };
-
-  function esc(s) {
-    return String(s == null ? "" : s)
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, """);
+    await refresh();
+  } catch (e) {
+    alert(String(e.message || e));
   }
+  file.value = "";
+}
 
-  function render(jobs, elId, empty) {
-    var el = $(elId);
+async function openNotes(id, name) {
+  var box = document.getElementById("notesBox");
+  box.style.display = "block";
+  document.getElementById("notesTitle").textContent = name || "Notes";
+  document.getElementById("notesBody").textContent = "Loading…";
+  var res = await fetch(API + "/api/jobs/" + id + "/result");
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    document.getElementById("notesMeta").textContent = data.error || data.detail || "No notes";
+    document.getElementById("notesBody").textContent = "";
+    return;
+  }
+  var n = data.notes || {};
+  document.getElementById("notesMeta").textContent = (n.provider_used || "") + " " + (n.processed_at || "");
+  document.getElementById("notesBody").textContent = n.full_notes || "";
+}
+
+async function dismiss(id) {
+  await fetch(API + "/api/jobs/" + id, { method: "DELETE" });
+  refresh();
+}
+
+function esc(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function refresh() {
+  try {
+    var res = await fetch(API + "/api/jobs");
+    if (!res.ok) {
+      document.getElementById("list").textContent = "HTTP " + res.status;
+      return;
+    }
+    var data = await res.json();
+    var jobs = data.jobs || [];
     if (!jobs.length) {
-      el.innerHTML = "<p class=\"meta\">" + empty + "</p>";
+      document.getElementById("list").innerHTML = "<p class=\"meta\">No jobs yet</p>";
       return;
     }
-    el.innerHTML = jobs.map(function (j) {
+    var html = "";
+    for (var i = 0; i < jobs.length; i++) {
+      var j = jobs[i];
       var st = (j.status || "queued").toLowerCase();
-      var open = st === "forged"
-        ? " class=\"row go\" data-id=\"" + esc(j.id) + "\" data-name=\"" + esc(j.filename || "") + "\""
-        : " class=\"row\"";
-      var err = st === "failed" && j.error ? "<div class=\"err\">" + esc(j.error) + "</div>" : "";
-      var act = st === "failed"
-        ? "<button type=\"button\" class=\"btn-sm btn-danger\" data-dismiss=\"" + esc(j.id) + "\">Dismiss</button>"
-        : (st === "forged" ? "<span class=\"meta\">open</span>" : "");
-      return "<div" + open + ">" +
-        "<div class=\"fname\">" + esc(j.filename || "") + err + "</div>" +
-        "<span class=\"st " + st + "\">" + st + "</span>" + act + "</div>";
-    }).join("");
-
-    el.querySelectorAll("[data-id]").forEach(function (row) {
-      row.addEventListener("click", function () {
-        window.openNotes(row.getAttribute("data-id"), row.getAttribute("data-name"));
-      });
-    });
-    el.querySelectorAll("[data-dismiss]").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        window.dismissJob(btn.getAttribute("data-dismiss"));
-      });
-    });
-  }
-
-  async function refresh() {
-    try {
-      var res = await fetch(API + "/api/jobs");
-      if (!res.ok) {
-        $("queue").innerHTML = "<p class=\"meta\">HTTP " + res.status + "</p>";
-        return;
+      html += "<div class=\"row\">";
+      html += "<div style=\"flex:1;min-width:0\"><div>" + esc(j.filename) + "</div>";
+      if (st === "failed" && j.error) html += "<div class=\"meta\" style=\"color:#F87171\">" + esc(j.error) + "</div>";
+      html += "</div><span class=\"st " + st + "\">" + st + "</span>";
+      if (st === "forged") {
+        html += " <button type=\"button\" class=\"ghost\" data-open=\"" + esc(j.id) + "\" data-name=\"" + esc(j.filename) + "\">Open</button>";
       }
-      var data = await res.json();
-      var jobs = data.jobs || [];
-      render(jobs, "queue", "No jobs yet. Upload a .txt");
-      render(jobs, "history", "No history yet.");
-    } catch (e) {
-      $("queue").innerHTML = "<p class=\"meta\">" + esc(e.message || e) + "</p>";
+      if (st === "failed") {
+        html += " <button type=\"button\" class=\"danger\" data-del=\"" + esc(j.id) + "\">Dismiss</button>";
+      }
+      html += "</div>";
     }
+    document.getElementById("list").innerHTML = html;
+    var opens = document.querySelectorAll("[data-open]");
+    for (var a = 0; a < opens.length; a++) {
+      opens[a].onclick = (function (btn) {
+        return function () { openNotes(btn.getAttribute("data-open"), btn.getAttribute("data-name")); };
+      })(opens[a]);
+    }
+    var dels = document.querySelectorAll("[data-del]");
+    for (var b = 0; b < dels.length; b++) {
+      dels[b].onclick = (function (btn) {
+        return function () { dismiss(btn.getAttribute("data-del")); };
+      })(dels[b]);
+    }
+  } catch (e) {
+    document.getElementById("list").textContent = String(e.message || e);
   }
-})();
+}
 </script>
 </body>
 </html>
