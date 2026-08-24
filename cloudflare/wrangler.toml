@@ -1,14 +1,12 @@
-# Study Forge — Worker must run first so /api/* is not swallowed by static assets
 name = "study-forge"
 main = "worker.js"
 compatibility_date = "2024-11-01"
 
+# Static UI — Worker handles /api/* first
 [assets]
 directory = "../web"
 binding = "ASSETS"
-# Critical: API routes handled by Worker, not SPA fallback
-run_worker_first = true
-not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
 
 [[r2_buckets]]
 binding = "FILES"
