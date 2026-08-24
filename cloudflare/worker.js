@@ -1,7 +1,8 @@
 /**
  * Study Forge Worker
- * /api/* → D1 + R2 + optional Groq
- * else → static UI
+ * Processing order:
+ *   1) LM Studio via Cloudflare Tunnel (LMSTUDIO_BASE_URL secret)
+ *   2) Groq BYOK (GROQ_API_KEY secret)
  */
 
 const CORS = {
@@ -17,50 +18,97 @@ function json(data, status) {
   });
 }
 
-async function groqChat(env, system, user) {
-  if (!env.GROQ_API_KEY) throw new Error("GROQ_API_KEY not set (wrangler secret put GROQ_API_KEY)");
-  const model = env.GROQ_MODEL || "llama-3.1-8b-instant";
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + env.GROQ_API_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: model,
-      temperature: 0.3,
-      max_tokens: 2500,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error("Groq " + res.status + ": " + t.slice(0, 300));
+/** OpenAI-compatible chat (LM Studio tunnel or Groq) */
+async function chat(env, system, user) {
+  const lmBase = (env.LMSTUDIO_BASE_URL || "").replace(/\/$/, "");
+  const lmModel = env.LMSTUDIO_MODEL || "local-model";
+
+  // 1) LM Studio via tunnel
+  if (lmBase) {
+    const url = lmBase.includes("/v1")
+      ? lmBase + "/chat/completions"
+      : lmBase + "/v1/chat/completions";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: lmModel,
+        temperature: 0.3,
+        max_tokens: 2500,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      }),
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error("LM Studio " + res.status + ": " + t.slice(0, 300));
+    }
+    const data = await res.json();
+    const text =
+      (data.choices &&
+        data.choices[0] &&
+        data.choices[0].message &&
+        data.choices[0].message.content) ||
+      "";
+    if (!text.trim()) throw new Error("LM Studio empty response");
+    return { text: text.trim(), provider: "lmstudio" };
   }
-  const data = await res.json();
-  const text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
-  if (!text.trim()) throw new Error("Groq empty response");
-  return text.trim();
+
+  // 2) Groq fallback
+  if (env.GROQ_API_KEY) {
+    const model = env.GROQ_MODEL || "llama-3.1-8b-instant";
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + env.GROQ_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: model,
+        temperature: 0.3,
+        max_tokens: 2500,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      }),
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error("Groq " + res.status + ": " + t.slice(0, 300));
+    }
+    const data = await res.json();
+    const text =
+      (data.choices &&
+        data.choices[0] &&
+        data.choices[0].message &&
+        data.choices[0].message.content) ||
+      "";
+    if (!text.trim()) throw new Error("Groq empty response");
+    return { text: text.trim(), provider: "groq" };
+  }
+
+  throw new Error(
+    "No LLM configured. Set LMSTUDIO_BASE_URL (tunnel) or GROQ_API_KEY secret."
+  );
 }
 
 async function processJob(env, jobId) {
   const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(jobId).first();
   if (!row) return;
-  const now = new Date().toISOString();
   try {
     await env.DB.prepare("UPDATE jobs SET status = ?, updated_at = ?, error = NULL WHERE id = ?")
-      .bind("forging", now, jobId).run();
+      .bind("forging", new Date().toISOString(), jobId)
+      .run();
 
     const obj = await env.FILES.get(row.r2_key);
     if (!obj) throw new Error("File missing in R2");
-    const bytes = new Uint8Array(await obj.arrayBuffer());
-    const text = new TextDecoder("utf-8").decode(bytes).trim();
+    const text = new TextDecoder("utf-8").decode(new Uint8Array(await obj.arrayBuffer())).trim();
     if (text.length < 10) throw new Error("Text too short — use a .txt study file");
 
-    const notes = await groqChat(
+    const out = await chat(
       env,
       "Turn study material into clear student notes. Use headers: ## Summary, ## Key Points, ## Definitions, ## Flashcards, ## Study Notes. No preamble.",
       text.slice(0, 14000)
@@ -68,8 +116,8 @@ async function processJob(env, jobId) {
 
     const result = {
       source_file: row.filename,
-      full_notes: notes,
-      provider_used: "groq",
+      full_notes: out.text,
+      provider_used: out.provider,
       processed_at: new Date().toISOString(),
       host: "cloudflare",
     };
@@ -79,11 +127,14 @@ async function processJob(env, jobId) {
     });
     await env.DB.prepare(
       "UPDATE jobs SET status = ?, updated_at = ?, result_r2_key = ?, error = NULL WHERE id = ?"
-    ).bind("forged", new Date().toISOString(), resultKey, jobId).run();
+    )
+      .bind("forged", new Date().toISOString(), resultKey, jobId)
+      .run();
   } catch (err) {
     const msg = String(err && err.message ? err.message : err).slice(0, 500);
     await env.DB.prepare("UPDATE jobs SET status = ?, updated_at = ?, error = ? WHERE id = ?")
-      .bind("failed", new Date().toISOString(), msg, jobId).run();
+      .bind("failed", new Date().toISOString(), msg, jobId)
+      .run();
   }
 }
 
@@ -92,8 +143,7 @@ async function handleApi(request, env, ctx) {
     return new Response(null, { status: 204, headers: CORS });
   }
 
-  const url = new URL(request.url);
-  const path = url.pathname;
+  const path = new URL(request.url).pathname;
 
   if (!env.DB || !env.FILES) {
     return json({ error: "DB or FILES binding missing" }, 503);
@@ -103,14 +153,17 @@ async function handleApi(request, env, ctx) {
     return json({
       ok: true,
       service: "study-forge",
-      version: "0.5.0",
+      version: "0.6.0",
       host: "cloudflare",
+      lmstudio: Boolean(env.LMSTUDIO_BASE_URL),
       groq: Boolean(env.GROQ_API_KEY),
     });
   }
 
   if (path === "/api/jobs/clear-failed" && request.method === "POST") {
-    const { results } = await env.DB.prepare("SELECT id, r2_key, result_r2_key FROM jobs WHERE status = 'failed'").all();
+    const { results } = await env.DB.prepare(
+      "SELECT id, r2_key, result_r2_key FROM jobs WHERE status = 'failed'"
+    ).all();
     for (const j of results || []) {
       try {
         if (j.r2_key) await env.FILES.delete(j.r2_key);
@@ -141,7 +194,9 @@ async function handleApi(request, env, ctx) {
     const ts = new Date().toISOString();
     await env.DB.prepare(
       "INSERT INTO jobs (id, filename, r2_key, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)"
-    ).bind(id, filename, key, "queued", ts, ts).run();
+    )
+      .bind(id, filename, key, "queued", ts, ts)
+      .run();
 
     if (ctx && ctx.waitUntil) ctx.waitUntil(processJob(env, id));
     else await processJob(env, id);
@@ -149,7 +204,6 @@ async function handleApi(request, env, ctx) {
     return json({ id: id, filename: filename, status: "queued" }, 201);
   }
 
-  // /api/jobs/:id/result
   const resultMatch = path.match(/^\/api\/jobs\/([^/]+)\/result$/);
   if (resultMatch && request.method === "GET") {
     const id = resultMatch[1];
@@ -163,7 +217,6 @@ async function handleApi(request, env, ctx) {
     return json({ job: { id: row.id, filename: row.filename }, notes: await obj.json() });
   }
 
-  // DELETE /api/jobs/:id
   const delMatch = path.match(/^\/api\/jobs\/([^/]+)$/);
   if (delMatch && request.method === "DELETE") {
     const id = delMatch[1];
@@ -187,9 +240,7 @@ export default {
       if (url.pathname.startsWith("/api/")) {
         return await handleApi(request, env, ctx);
       }
-      if (env.ASSETS) {
-        return env.ASSETS.fetch(request);
-      }
+      if (env.ASSETS) return env.ASSETS.fetch(request);
       return new Response("Study Forge", { status: 200 });
     } catch (err) {
       return json({ error: String(err && err.message ? err.message : err) }, 500);
