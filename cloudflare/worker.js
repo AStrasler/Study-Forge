@@ -1,17 +1,17 @@
 /**
  * Study Forge Worker — studyforge.studio
- * Upload → R2 + D1 → Groq BYOK processing on Cloudflare (not your laptop)
- * Private Ollama remains optional elsewhere; this path is cloud-hosted.
+ * Upload → R2 + D1 → Groq BYOK → notes on screen (Notion is manual)
  */
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "openai/gpt-oss-20b";
+// Fast + widely available on Groq free tier
+const DEFAULT_MODEL = "llama-3.1-8b-instant";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -20,7 +20,7 @@ function json(data, status = 200) {
   });
 }
 
-async function groqChat(env, system, user, maxTokens = 1200) {
+async function groqChat(env, system, user, maxTokens = 1500) {
   const key = env.GROQ_API_KEY;
   if (!key) throw new Error("GROQ_API_KEY secret not set on Worker");
   const model = env.GROQ_MODEL || DEFAULT_MODEL;
@@ -42,7 +42,7 @@ async function groqChat(env, system, user, maxTokens = 1200) {
   });
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`Groq HTTP ${res.status}: ${t.slice(0, 300)}`);
+    throw new Error(`Groq HTTP ${res.status}: ${t.slice(0, 400)}`);
   }
   const data = await res.json();
   const text = data.choices?.[0]?.message?.content?.trim() || "";
@@ -53,24 +53,29 @@ async function groqChat(env, system, user, maxTokens = 1200) {
 async function extractText(filename, bytes) {
   const lower = (filename || "").toLowerCase();
   const dec = new TextDecoder("utf-8", { fatal: false });
-  if (lower.endsWith(".txt") || lower.endsWith(".md") || lower.endsWith(".markdown") || lower.endsWith(".csv")) {
+  if (
+    lower.endsWith(".txt") ||
+    lower.endsWith(".md") ||
+    lower.endsWith(".markdown") ||
+    lower.endsWith(".csv")
+  ) {
     return dec.decode(bytes).trim();
   }
-  // Best-effort for other types (PDF/DOCX need dedicated parsers later)
   const asText = dec.decode(bytes).trim();
   if (asText.length > 80 && !asText.includes("\u0000")) return asText;
   throw new Error(
-    "Cloud processing currently supports .txt / .md. Convert PDF/DOCX to text or use a future parser."
+    "Cloud path supports .txt / .md for now. Convert PDF/DOCX to text first."
   );
 }
 
+/** One Groq call → structured study notes (fewer failures than 5 sequential calls) */
 async function processJob(env, jobId) {
   const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(jobId).first();
   if (!row) return;
 
   const now = () => new Date().toISOString();
   try {
-    await env.DB.prepare("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?")
+    await env.DB.prepare("UPDATE jobs SET status = ?, updated_at = ?, error = NULL WHERE id = ?")
       .bind("forging", now(), jobId)
       .run();
 
@@ -80,42 +85,41 @@ async function processJob(env, jobId) {
     const text = await extractText(row.filename, bytes);
     if (!text || text.length < 10) throw new Error("Extracted text too short");
 
-    const clip = text.slice(0, 12000);
+    const clip = text.slice(0, 14000);
+    const notes = await groqChat(
+      env,
+      `You turn study material into clear notes for a student.
+Return plain text with these exact section headers:
+## Summary
+## Key Points
+## Definitions
+## Flashcards
+## Study Notes
+Be concise. No preamble before ## Summary.`,
+      clip,
+      2500
+    );
 
-    const summary = await groqChat(
-      env,
-      "You are a study summarizer. Write a concise lecture summary. No preamble.",
-      clip
-    );
-    const keyPoints = await groqChat(
-      env,
-      "Extract 5–8 key study takeaways as a numbered list. No preamble.",
-      clip
-    );
-    const flashcards = await groqChat(
-      env,
-      "Create 5–8 Q&A flashcards for active recall. Format: Q: ... A: ...",
-      clip
-    );
-    const definitions = await groqChat(
-      env,
-      "List important terms and short definitions from the material.",
-      clip
-    );
-    const synthesized = await groqChat(
-      env,
-      "You are the Judge. Merge the following into coherent study notes. Remove redundancy.",
-      `SUMMARY:\n${summary}\n\nKEY POINTS:\n${keyPoints}\n\nDEFINITIONS:\n${definitions}\n\nFLASHCARDS:\n${flashcards}`
-    );
+    // Light split for UI sections
+    function section(name) {
+      const re = new RegExp(
+        `##\\s*${name}\\s*\\n([\\s\\S]*?)(?=\\n##\\s|$)`,
+        "i"
+      );
+      const m = notes.match(re);
+      return m ? m[1].trim() : "";
+    }
 
     const result = {
       source_file: row.filename,
-      summary,
-      key_points: keyPoints,
-      flashcards,
-      definitions,
-      synthesized,
+      summary: section("Summary") || notes,
+      key_points: section("Key Points"),
+      definitions: section("Definitions"),
+      flashcards: section("Flashcards"),
+      synthesized: section("Study Notes") || notes,
+      full_notes: notes,
       provider_used: "groq",
+      model: env.GROQ_MODEL || DEFAULT_MODEL,
       processed_at: now(),
       host: "cloudflare",
     };
@@ -154,15 +158,30 @@ async function handleApi(request, env, ctx) {
     return json({
       ok: true,
       service: "study-forge",
-      version: "0.3.0",
+      version: "0.4.0",
       host: "cloudflare",
       groq: Boolean(env.GROQ_API_KEY),
     });
   }
 
+  // Clear all failed jobs (+ optional R2 cleanup best-effort)
+  if (path === "/api/jobs/clear-failed" && request.method === "POST") {
+    const { results } = await env.DB.prepare(
+      "SELECT id, r2_key, result_r2_key FROM jobs WHERE status = 'failed'"
+    ).all();
+    for (const j of results || []) {
+      try {
+        if (j.r2_key) await env.FILES.delete(j.r2_key);
+        if (j.result_r2_key) await env.FILES.delete(j.result_r2_key);
+      } catch (_) {}
+    }
+    await env.DB.prepare("DELETE FROM jobs WHERE status = 'failed'").run();
+    return json({ cleared: (results || []).length });
+  }
+
   if (path === "/api/jobs" && request.method === "GET") {
     const { results } = await env.DB.prepare(
-      `SELECT id, filename, status, created_at, updated_at, notion_pushed, error, result_r2_key
+      `SELECT id, filename, status, created_at, updated_at, error, result_r2_key
        FROM jobs ORDER BY created_at DESC LIMIT 50`
     ).all();
     return json({ jobs: results || [] });
@@ -189,26 +208,49 @@ async function handleApi(request, env, ctx) {
       .bind(id, filename, key, "queued", ts, ts)
       .run();
 
-    // Process on Cloudflare (not the user's laptop)
-    if (ctx && ctx.waitUntil) {
-      ctx.waitUntil(processJob(env, id));
-    } else {
-      await processJob(env, id);
-    }
+    if (ctx && ctx.waitUntil) ctx.waitUntil(processJob(env, id));
+    else await processJob(env, id);
 
     return json({ id, filename, status: "queued", r2_key: key }, 201);
   }
 
-  // Force reprocess
-  if (path.startsWith("/api/jobs/") && path.endsWith("/process") && request.method === "POST") {
+  // GET notes for a forged job
+  if (path.match(/^\/api\/jobs\/[^/]+\/result$/) && request.method === "GET") {
+    const id = path.split("/")[3];
+    const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(id).first();
+    if (!row) return json({ error: "not found" }, 404);
+    if (row.status !== "forged" || !row.result_r2_key) {
+      return json({ error: "no notes yet", status: row.status, detail: row.error }, 404);
+    }
+    const obj = await env.FILES.get(row.result_r2_key);
+    if (!obj) return json({ error: "result file missing" }, 404);
+    const result = await obj.json();
+    return json({ job: { id: row.id, filename: row.filename, status: row.status }, notes: result });
+  }
+
+  // Reprocess
+  if (path.match(/^\/api\/jobs\/[^/]+\/process$/) && request.method === "POST") {
     const id = path.split("/")[3];
     if (ctx && ctx.waitUntil) ctx.waitUntil(processJob(env, id));
     else await processJob(env, id);
     return json({ id, status: "forging" });
   }
 
-  if (path.startsWith("/api/jobs/") && request.method === "GET") {
-    const id = path.split("/").pop();
+  // Delete one job
+  if (path.match(/^\/api\/jobs\/[^/]+$/) && request.method === "DELETE") {
+    const id = path.split("/")[3];
+    const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(id).first();
+    if (!row) return json({ error: "not found" }, 404);
+    try {
+      if (row.r2_key) await env.FILES.delete(row.r2_key);
+      if (row.result_r2_key) await env.FILES.delete(row.result_r2_key);
+    } catch (_) {}
+    await env.DB.prepare("DELETE FROM jobs WHERE id = ?").bind(id).run();
+    return json({ deleted: id });
+  }
+
+  if (path.match(/^\/api\/jobs\/[^/]+$/) && request.method === "GET") {
+    const id = path.split("/")[3];
     const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(id).first();
     if (!row) return json({ error: "not found" }, 404);
     return json({ job: row });
