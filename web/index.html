@@ -17,39 +17,41 @@
 .field input{width:100%;background:var(--ink-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;color:var(--bone);font-size:14px;font-family:JetBrains Mono,monospace}
 .btn-primary{width:100%;margin-top:8px;background:linear-gradient(180deg,var(--ember),#E5601C);color:#1a0900;font-weight:600;font-size:14.5px;border-radius:var(--radius-sm);padding:12px}
 .btn-ghost{background:var(--surface-2);color:var(--bone);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:500}
-.btn-ghost:hover{border-color:var(--steel)}
 .btn-danger{background:var(--red-soft);color:var(--red);border:1px solid rgba(248,113,113,.35);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:500}
 .login-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--border-soft);font-size:12px;color:var(--slate-dim)}
 #dashboard-view{display:none;min-height:100vh}#dashboard-view.active{display:flex}
-.sidebar{width:220px;flex-shrink:0;background:var(--ink-2);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:20px 16px;position:sticky;top:0;height:100vh}
-.nav-label{font-size:10.5px;color:var(--slate-dim);text-transform:uppercase;letter-spacing:.08em;padding:0 10px 8px}
-.nav-item{display:block;padding:9px 10px;border-radius:var(--radius-sm);font-size:13.5px;color:var(--slate);text-decoration:none;margin-bottom:2px;border:1px solid transparent}
+.sidebar{width:230px;flex-shrink:0;background:var(--ink-2);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:20px 16px;position:sticky;top:0;height:100vh}
+.nav-label{font-size:10.5px;color:var(--slate-dim);text-transform:uppercase;letter-spacing:.08em;padding:0 10px 8px;margin-top:8px}
+.nav-item{display:block;padding:9px 10px;border-radius:var(--radius-sm);font-size:13.5px;color:var(--slate);text-decoration:none;margin-bottom:2px;border:1px solid transparent;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface-2);color:var(--bone)}
 .nav-item.active{background:var(--ember-soft);color:var(--bone);border-color:var(--ember-line)}
 .sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--border-soft)}
 .instance-pill{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--slate-dim);padding:8px 10px}
-.dot{width:7px;height:7px;border-radius:50%;display:inline-block}.dot.green{background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}.dot.green{background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}.dot.red{background:var(--red)}
 .main{flex:1;min-width:0}
 .topbar{height:64px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;background:rgba(11,13,16,.85);backdrop-filter:blur(10px);z-index:10}
 .status-chip{display:flex;align-items:center;gap:7px;background:var(--green-soft);border:1px solid rgba(74,222,128,.3);color:var(--green);font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:100px}
+.status-chip.warn{background:var(--red-soft);border-color:rgba(248,113,113,.35);color:var(--red)}
 .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--ember),var(--steel));display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#0B0D10}
 .content{padding:32px 28px 60px;max-width:1100px}.page-head{margin-bottom:24px}.page-head h1{font-size:25px;margin-bottom:6px}.page-head p{color:var(--slate);font-size:14px}
+.view{display:none}.view.active{display:block}
 .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);padding:22px;margin-bottom:18px}
 .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}.card-head h2{font-size:14.5px;font-weight:600}.card-head .count{font-size:11.5px;color:var(--slate-dim)}
 .dropzone{border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:34px 20px;text-align:center;cursor:pointer}
 .dropzone:hover{border-color:var(--ember-line);background:var(--ember-soft)}.dropzone.busy{opacity:.6;pointer-events:none}
-.filetypes{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.filetypes{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
 .filetype-tag{font-size:10.5px;color:var(--slate);border:1px solid var(--border);padding:3px 8px;border-radius:5px;font-family:JetBrains Mono,monospace}
 .queue-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-soft)}.queue-row:last-child{border-bottom:none}
 .queue-row.clickable{cursor:pointer}.queue-row.clickable:hover{background:rgba(255,255,255,.02)}
 .queue-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--surface-2);font-size:10px;font-weight:700;color:var(--slate);flex-shrink:0}
 .queue-info{flex:1;min-width:0}.queue-info .fname{font-size:13.5px;font-weight:500;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.queue-info .err{font-size:11px;color:var(--red);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.heat-bar{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden}.heat-fill{height:100%;border-radius:3px}
+.queue-info .err{font-size:11px;color:var(--red);margin-top:4px}
+.queue-info .when{font-size:11px;color:var(--slate-dim);margin-top:2px}
+.heat-bar{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:6px}.heat-fill{height:100%;border-radius:3px}
 .heat-fill.forging{background:linear-gradient(90deg,var(--steel),var(--ember));width:60%}.heat-fill.forged{background:var(--green);width:100%}.heat-fill.queued{background:var(--slate-dim);width:8%}.heat-fill.failed{background:var(--red);width:100%}
 .queue-status{font-size:10.5px;font-weight:600;text-transform:uppercase;padding:4px 9px;border-radius:100px;flex-shrink:0}
 .queue-status.forging{background:var(--ember-soft);color:var(--ember)}.queue-status.forged{background:var(--green-soft);color:var(--green)}.queue-status.queued{background:var(--surface-2);color:var(--slate)}.queue-status.failed{background:var(--red-soft);color:var(--red)}
-.notes-body{font-size:13.5px;line-height:1.65;color:var(--bone);white-space:pre-wrap;font-family:Inter,sans-serif}
-.notes-body h3{font-size:13px;color:var(--steel);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em}
+.notes-body{font-size:13.5px;line-height:1.65;color:var(--bone);white-space:pre-wrap}
 .notes-meta{font-size:12px;color:var(--slate-dim);margin-bottom:14px}
 .footnote{margin-top:8px;text-align:center;font-size:12px;color:var(--slate-dim);padding:12px 0}
 .provider-meta{font-size:11.5px;color:var(--slate-dim)}
@@ -61,73 +63,121 @@
   <div class="login-card">
     <div class="wordmark"><svg class="mark" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#1B1F26"/><path d="M9 20L15 8L21 20" stroke="#FF7A33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="15.5" r="1.6" fill="#5EA8FF"/></svg><span class="display">Study Forge</span></div>
     <h1 class="display">Enter your instance</h1>
-    <p class="sub">studyforge.studio · single-user</p>
+    <p class="sub">Cloud-hosted · your keys</p>
     <div class="field"><label for="user">Username</label><input id="user" type="text" placeholder="you" autocomplete="username"></div>
     <div class="field"><label for="pass">Password</label><input id="pass" type="password" placeholder="••••••••••" autocomplete="current-password"></div>
-    <button class="btn-primary" onclick="enterForge()">Enter the forge</button>
+    <button class="btn-primary" type="button" onclick="enterForge()">Enter the forge</button>
     <div class="login-foot"><strong>No public signup.</strong> Cloudflare Access protects this site.</div>
   </div>
 </div>
+
 <div id="dashboard-view">
   <aside class="sidebar">
     <div class="wordmark"><svg class="mark" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#1B1F26"/><path d="M9 20L15 8L21 20" stroke="#FF7A33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="15.5" r="1.6" fill="#5EA8FF"/></svg><span class="display">Study Forge</span></div>
     <div class="nav-label">Workspace</div>
-    <a class="nav-item active" href="#">Overview</a>
-    <div class="sidebar-foot"><div class="instance-pill"><span class="dot green"></span> Cloud engine · v0.4</div></div>
+    <button type="button" class="nav-item active" data-view="overview" onclick="showView('overview')">Overview</button>
+    <button type="button" class="nav-item" data-view="history" onclick="showView('history')">Upload history</button>
+    <button type="button" class="nav-item" data-view="notes" onclick="showView('notes')">Notes</button>
+    <div class="sidebar-foot"><div class="instance-pill"><span class="dot green" id="engine-dot"></span> <span id="engine-label">Checking…</span></div></div>
   </aside>
+
   <div class="main">
     <div class="topbar">
-      <span class="mono">studyforge.studio</span>
-      <div style="display:flex;align-items:center;gap:14px"><span class="status-chip"><span class="dot green"></span>Cloud + Groq BYOK</span><div class="avatar">SF</div></div>
+      <span class="mono" id="host-label">studyforge.studio</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span class="status-chip" id="api-chip"><span class="dot green"></span><span id="api-chip-text">API…</span></span>
+        <div class="avatar">SF</div>
+      </div>
     </div>
+
     <div class="content">
-      <div class="page-head">
-        <h1 class="display">Welcome back.</h1>
-        <p>Upload → forge on Cloudflare → read notes here. Copy into Notion yourself.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><h2>Upload materials</h2></div>
-        <div class="dropzone" id="dropzone">
-          <p>Upload study materials</p>
-          <p class="provider-meta">Prefer .txt or .md for cloud path · PDF later</p>
-          <div class="filetypes"><span class="filetype-tag">.txt</span><span class="filetype-tag">.md</span><span class="filetype-tag">.pdf</span></div>
-          <input type="file" id="file-input" accept=".pdf,.docx,.pptx,.txt,.md" hidden multiple>
+      <!-- OVERVIEW -->
+      <div class="view active" id="view-overview">
+        <div class="page-head">
+          <h1 class="display">Welcome back.</h1>
+          <p>Upload → forge on Cloudflare → open notes here. Copy into Notion yourself.</p>
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-head">
-          <h2>Forge queue</h2>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="count mono" id="queue-count">0 items</span>
-            <button type="button" class="btn-danger" id="btn-clear-failed" title="Remove failed jobs">Clear failed</button>
+        <div class="card">
+          <div class="card-head"><h2>Upload materials</h2></div>
+          <div class="dropzone" id="dropzone">
+            <p>Upload study materials</p>
+            <p class="provider-meta">Best: .txt or .md · PDF support is limited on cloud path</p>
+            <div class="filetypes"><span class="filetype-tag">.txt</span><span class="filetype-tag">.md</span></div>
+            <input type="file" id="file-input" accept=".txt,.md,.markdown,.pdf,.docx,.pptx" hidden multiple>
           </div>
         </div>
-        <div id="queue-list"><p class="provider-meta">No jobs yet.</p></div>
-      </div>
-
-      <div class="card" id="notes-card" style="display:none">
-        <div class="card-head">
-          <h2 id="notes-title">Notes</h2>
-          <button type="button" class="btn-ghost" id="btn-copy">Copy all</button>
+        <div class="card">
+          <div class="card-head">
+            <h2>Active queue</h2>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="count mono" id="queue-count">0 items</span>
+              <button type="button" class="btn-danger" id="btn-clear-failed">Clear failed</button>
+            </div>
+          </div>
+          <div id="queue-list"><p class="provider-meta">Loading…</p></div>
         </div>
-        <div class="notes-meta" id="notes-meta"></div>
-        <div class="notes-body" id="notes-body"></div>
       </div>
 
-      <p class="footnote"><strong>No auto-Notion.</strong> Copy notes from here into Notion when you want.</p>
+      <!-- HISTORY -->
+      <div class="view" id="view-history">
+        <div class="page-head">
+          <h1 class="display">Upload history</h1>
+          <p>Everything stored in D1 — persists across visits. Click a forged job to open notes.</p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h2>All jobs</h2>
+            <span class="count mono" id="history-count">0</span>
+          </div>
+          <div id="history-list"><p class="provider-meta">Loading…</p></div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="view" id="view-notes">
+        <div class="page-head">
+          <h1 class="display">Notes</h1>
+          <p>Open a forged job from History or the queue. Copy into Notion when you want.</p>
+        </div>
+        <div class="card" id="notes-card">
+          <div class="card-head">
+            <h2 id="notes-title">No notes open</h2>
+            <button type="button" class="btn-ghost" id="btn-copy">Copy all</button>
+          </div>
+          <div class="notes-meta" id="notes-meta">Pick a forged file from Upload history.</div>
+          <div class="notes-body" id="notes-body"></div>
+        </div>
+      </div>
+
+      <p class="footnote"><strong>No auto-Notion.</strong> Notes stay on screen until you copy them.</p>
     </div>
   </div>
 </div>
+
 <script>
+// Same-origin API (works on studyforge.studio and any *.studyforge.studio)
 const API = localStorage.getItem('sf_api_base') || '';
 let pollTimer = null;
+let lastJobs = [];
+
+document.getElementById('host-label').textContent = location.hostname || 'studyforge.studio';
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + name);
+  if (view) view.classList.add('active');
+  const nav = document.querySelector('.nav-item[data-view="'+name+'"]');
+  if (nav) nav.classList.add('active');
+  if (name === 'history' || name === 'overview') refreshJobs();
+}
 
 function enterForge(){
   document.getElementById('login-view').style.display='none';
   document.getElementById('dashboard-view').classList.add('active');
+  checkHealth();
   refreshJobs();
+  if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(refreshJobs, 4000);
 }
 document.getElementById('pass').addEventListener('keydown',e=>{if(e.key==='Enter')enterForge()});
@@ -139,15 +189,35 @@ dz.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])upl
 fi.addEventListener('change',()=>{if(fi.files[0])uploadFile(fi.files[0])});
 
 document.getElementById('btn-clear-failed').addEventListener('click', async ()=>{
-  if(!confirm('Delete all failed jobs?'))return;
+  if(!confirm('Delete all failed jobs from history?'))return;
   await fetch(API+'/api/jobs/clear-failed',{method:'POST'});
   refreshJobs();
 });
 
 document.getElementById('btn-copy').addEventListener('click', async ()=>{
   const t=document.getElementById('notes-body').innerText;
+  if(!t){alert('No notes to copy');return}
   try{await navigator.clipboard.writeText(t);alert('Copied — paste into Notion');}catch(_){alert('Select text and copy manually');}
 });
+
+async function checkHealth(){
+  const chip=document.getElementById('api-chip');
+  const text=document.getElementById('api-chip-text');
+  const label=document.getElementById('engine-label');
+  try{
+    const res=await fetch(API+'/api/health');
+    const data=await res.json();
+    if(data.ok){
+      chip.classList.remove('warn');
+      text.textContent = data.groq ? 'API + Groq ready' : 'API up · set GROQ secret';
+      label.textContent = 'Cloud engine · v'+(data.version||'?');
+    } else throw new Error('not ok');
+  }catch(e){
+    chip.classList.add('warn');
+    text.textContent = 'API unreachable';
+    label.textContent = 'API offline';
+  }
+}
 
 async function uploadFile(file){
   const form=new FormData();form.append('file',file);dz.classList.add('busy');
@@ -156,7 +226,8 @@ async function uploadFile(file){
     const data=await res.json().catch(()=>({}));
     if(!res.ok){alert(data.error||('Upload failed: '+res.status));return}
     await refreshJobs();
-  }catch(e){alert('Upload error: '+(e.message||e))}
+    showView('overview');
+  }catch(e){alert('Upload error: '+(e.message||e)+'\n\nIf this persists, open /api/health on this same domain.');}
   finally{dz.classList.remove('busy');fi.value=''}
 }
 
@@ -166,60 +237,76 @@ async function dismissJob(id){
 }
 
 async function openNotes(id, filename){
+  showView('notes');
+  document.getElementById('notes-title').textContent = 'Loading…';
+  document.getElementById('notes-body').textContent = '';
   const res=await fetch(API+'/api/jobs/'+id+'/result');
   const data=await res.json().catch(()=>({}));
-  if(!res.ok){alert(data.error||data.detail||'No notes');return}
+  if(!res.ok){
+    document.getElementById('notes-title').textContent = filename||'Notes';
+    document.getElementById('notes-meta').textContent = data.error || data.detail || 'No notes yet';
+    return;
+  }
   const n=data.notes||{};
-  const card=document.getElementById('notes-card');
-  card.style.display='block';
-  document.getElementById('notes-title').textContent=filename||n.source_file||'Notes';
-  document.getElementById('notes-meta').textContent=
-    (n.provider_used||'groq')+' · '+(n.processed_at||'')+' · host '+(n.host||'cloudflare');
-  const parts=[];
-  if(n.full_notes) parts.push(n.full_notes);
+  document.getElementById('notes-title').textContent = filename||n.source_file||'Notes';
+  document.getElementById('notes-meta').textContent =
+    (n.provider_used||'groq')+' · '+(n.processed_at||'')+' · '+(n.host||'cloudflare');
+  if(n.full_notes) document.getElementById('notes-body').textContent = n.full_notes;
   else {
+    const parts=[];
     if(n.summary) parts.push('## Summary\n'+n.summary);
     if(n.key_points) parts.push('## Key Points\n'+n.key_points);
     if(n.definitions) parts.push('## Definitions\n'+n.definitions);
     if(n.flashcards) parts.push('## Flashcards\n'+n.flashcards);
     if(n.synthesized) parts.push('## Study Notes\n'+n.synthesized);
+    document.getElementById('notes-body').textContent = parts.join('\n\n');
   }
-  document.getElementById('notes-body').textContent=parts.join('\n\n');
-  card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderJobList(jobs, containerId, emptyMsg){
+  const list=document.getElementById(containerId);
+  if(!jobs.length){list.innerHTML='<p class="provider-meta">'+emptyMsg+'</p>';return}
+  list.innerHTML=jobs.map(j=>{
+    const st=(j.status||'queued').toLowerCase();
+    const cls=['forged','forging','failed','queued'].includes(st)?st:'queued';
+    const click=st==='forged'?`onclick="openNotes('${j.id}','${escAttr(j.filename||'')}')"`:'';
+    const rowCls=st==='forged'?'queue-row clickable':'queue-row';
+    const err=st==='failed'&&j.error?`<div class="err">${escapeHtml(j.error)}</div>`:'';
+    const when=j.created_at?`<div class="when">${escapeHtml(j.created_at)}</div>`:'';
+    const actions=st==='failed'
+      ?`<button type="button" class="btn-danger" onclick="event.stopPropagation();dismissJob('${j.id}')">Dismiss</button>`
+      :(st==='forged'?`<span class="provider-meta">open</span>`:'');
+    return `<div class="${rowCls}" ${click}>
+      <div class="queue-icon">FILE</div>
+      <div class="queue-info"><div class="fname">${escapeHtml(j.filename||'')}</div>
+      <div class="heat-bar"><div class="heat-fill ${cls}"></div></div>${when}${err}</div>
+      <span class="queue-status ${cls}">${st}</span>${actions}
+    </div>`;
+  }).join('');
 }
 
 async function refreshJobs(){
   try{
     const res=await fetch(API+'/api/jobs');
-    if(!res.ok)return;
+    if(!res.ok){
+      document.getElementById('queue-list').innerHTML='<p class="provider-meta">Could not load jobs (HTTP '+res.status+'). Check /api/health.</p>';
+      return;
+    }
     const data=await res.json();
-    const list=document.getElementById('queue-list');
-    const count=document.getElementById('queue-count');
-    const jobs=data.jobs||[];
-    count.textContent=jobs.length+' items';
-    if(!jobs.length){list.innerHTML='<p class="provider-meta">No jobs yet. Upload a .txt to start.</p>';return}
-    list.innerHTML=jobs.map(j=>{
-      const st=(j.status||'queued').toLowerCase();
-      const cls=['forged','forging','failed','queued'].includes(st)?st:'queued';
-      const click=st==='forged'?`onclick="openNotes('${j.id}','${(j.filename||'').replace(/'/g,"\\'")}')"`:'';
-      const rowCls=st==='forged'?'queue-row clickable':'queue-row';
-      const err=st==='failed'&&j.error?`<div class="err">${escapeHtml(j.error)}</div>`:'';
-      const actions=st==='failed'
-        ?`<button type="button" class="btn-danger" onclick="event.stopPropagation();dismissJob('${j.id}')">Dismiss</button>`
-        :(st==='forged'?`<span class="provider-meta">tap to open</span>`:'');
-      return `<div class="${rowCls}" ${click}>
-        <div class="queue-icon">FILE</div>
-        <div class="queue-info"><div class="fname">${escapeHtml(j.filename||'')}</div>
-        <div class="heat-bar"><div class="heat-fill ${cls}"></div></div>${err}</div>
-        <span class="queue-status ${cls}">${st}</span>${actions}
-      </div>`;
-    }).join('');
-  }catch(e){console.warn(e)}
+    lastJobs=data.jobs||[];
+    document.getElementById('queue-count').textContent=lastJobs.length+' items';
+    document.getElementById('history-count').textContent=String(lastJobs.length);
+    // Active queue: in-progress + recent
+    renderJobList(lastJobs,'queue-list','No jobs yet. Upload a .txt to start. Jobs are stored in D1 and should reappear after refresh.');
+    renderJobList(lastJobs,'history-list','No upload history yet.');
+  }catch(e){
+    console.warn(e);
+    document.getElementById('queue-list').innerHTML='<p class="provider-meta">API error — is this the Worker domain? Try https://studyforge.studio</p>';
+  }
 }
 
-function escapeHtml(s){
-  return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
-}
+function escapeHtml(s){return String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');}
+function escAttr(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 </script>
 </body>
 </html>
