@@ -5,216 +5,399 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Study Forge</title>
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#0B0D10;color:#EDEEF0;min-height:100vh}
-.wrap{max-width:720px;margin:0 auto;padding:24px}
-h1{font-size:22px;margin:0 0 8px}
-.sub{color:#8A909B;font-size:14px;margin-bottom:20px}
-.box{background:#14171C;border:1px solid #262B33;border-radius:12px;padding:16px;margin-bottom:16px}
-.drop{border:1px dashed #262B33;border-radius:8px;padding:28px;text-align:center;cursor:pointer;color:#8A909B}
-.drop:hover{border-color:#FF7A33}
-.row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #1E222A;font-size:13px}
+:root{--bg:#0B0D10;--card:#14171C;--line:#262B33;--soft:#1E222A;--ember:#FF7A33;--steel:#5EA8FF;--green:#4ADE80;--red:#F87171;--bone:#EDEEF0;--slate:#8A909B;--dim:#5B616C}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--bone);min-height:100vh}
+.wrap{max-width:820px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:0}h2{font-size:15px;margin:0 0 12px}
+.sub{color:var(--slate);font-size:13px;margin:6px 0 18px;line-height:1.5}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;cursor:pointer;color:var(--slate);font-size:14px}
+.drop:hover{border-color:var(--ember);background:rgba(255,122,51,.08)}
+.row{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--soft);font-size:13px}
 .row:last-child{border:0}
-.st{font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:#1B1F26;color:#8A909B}
-.st.forged{background:rgba(74,222,128,.14);color:#4ADE80}
-.st.forging{background:rgba(255,122,51,.14);color:#FF7A33}
-.st.failed{background:rgba(248,113,113,.14);color:#F87171}
-button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:600}
-.primary{background:#FF7A33;color:#1a0900}
-.ghost{background:#1B1F26;color:#EDEEF0;border:1px solid #262B33}
-.danger{background:rgba(248,113,113,.14);color:#F87171}
-.notes{white-space:pre-wrap;font-size:14px;line-height:1.6}
-.meta{color:#5B616C;font-size:12px;margin:8px 0}
-.chip{display:inline-block;font-size:12px;padding:4px 10px;border-radius:99px;background:rgba(74,222,128,.14);color:#4ADE80}
-.chip.bad{background:rgba(248,113,113,.14);color:#F87171}
-#login{max-width:360px;margin:80px auto;padding:24px}
+.st{font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:#1B1F26;color:var(--slate);flex-shrink:0}
+.st.forged{background:rgba(74,222,128,.14);color:var(--green)}.st.forging{background:rgba(255,122,51,.14);color:var(--ember)}.st.failed{background:rgba(248,113,113,.14);color:var(--red)}
+button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:600;font-size:13px;font-family:inherit}
+.primary{background:var(--ember);color:#1a0900}.ghost{background:#1B1F26;color:var(--bone);border:1px solid var(--line)}.danger{background:rgba(248,113,113,.12);color:var(--red)}
+.chip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(74,222,128,.14);color:var(--green)}
+.chip.bad{background:rgba(248,113,113,.14);color:var(--red)}
+.meta{color:var(--dim);font-size:12px;margin:6px 0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px}
+.tab{background:transparent;border:1px solid var(--line);color:var(--slate);padding:7px 11px;border-radius:99px;font-size:12px}
+.tab.on{background:rgba(255,122,51,.14);border-color:rgba(255,122,51,.4);color:var(--bone)}
+.panel{display:none}.panel.on{display:block}
+.prose{white-space:pre-wrap;font-size:14px;line-height:1.65;color:var(--bone)}
+.card{background:#0F1216;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer}
+.card .q{font-weight:600;font-size:14px;margin-bottom:8px}
+.card .a{color:var(--slate);font-size:13px;line-height:1.5;display:none}
+.card.show .a{display:block}
+.card .hint-flip{font-size:11px;color:var(--dim);margin-top:8px}
+.quiz-item{background:#0F1216;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.quiz-item .qq{font-weight:600;margin-bottom:10px;font-size:14px}
+.opt{display:block;width:100%;text-align:left;margin:5px 0;padding:10px 12px;background:#1B1F26;border:1px solid var(--line);border-radius:8px;color:var(--bone);font-weight:500}
+.opt:hover{border-color:var(--steel)}
+.opt.correct{border-color:var(--green);background:rgba(74,222,128,.1)}
+.opt.wrong{border-color:var(--red);background:rgba(248,113,113,.08)}
+.teach{font-size:13px;color:var(--slate);margin-top:10px;line-height:1.5;display:none}
+.teach.on{display:block}
+.teach strong{color:var(--steel)}
+#login{max-width:380px;margin:72px auto;padding:24px}
 #app{display:none}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.badge-free{font-size:11px;color:var(--steel);border:1px solid rgba(94,168,255,.35);padding:3px 8px;border-radius:99px}
 </style>
 </head>
 <body>
 
 <div id="login" class="box">
-  <h1>Study Forge</h1>
-  <p class="sub">Cloud queue · notes on screen · copy to Notion yourself</p>
+  <div class="top"><h1>Study Forge</h1><span class="badge-free">Free · your keys</span></div>
+  <p class="sub">Upload materials → full study pack (summary, cards, assistive quiz). Copy to Notion yourself. Not a homework answer key.</p>
   <button class="primary" type="button" id="go" style="width:100%">Enter the forge</button>
 </div>
 
 <div id="app" class="wrap">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h1>Study Forge</h1>
+  <div class="top">
+    <div>
+      <h1>Study Forge</h1>
+      <p class="sub" style="margin:4px 0 0" id="hint">Free use · private path preferred</p>
+    </div>
     <span class="chip" id="chip">…</span>
   </div>
-  <p class="sub" id="hint"></p>
 
   <div class="box">
-    <div class="drop" id="drop">Drop .txt / .md or click to upload
+    <h2>Upload</h2>
+    <div class="drop" id="drop">Drop .txt / .md or click to browse
       <input type="file" id="file" accept=".txt,.md,.markdown" hidden>
     </div>
   </div>
 
   <div class="box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <strong>Queue / history</strong>
+    <div class="top">
+      <h2 style="margin:0">Study packs</h2>
       <button type="button" class="danger" id="clear">Clear failed</button>
     </div>
-    <div id="list">Loading…</div>
+    <div id="list" class="meta">Loading…</div>
   </div>
 
-  <div class="box" id="notesBox" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong id="notesTitle">Notes</strong>
-      <button type="button" class="ghost" id="copy">Copy all</button>
+  <div class="box" id="packBox" style="display:none">
+    <div class="top">
+      <h2 style="margin:0" id="packTitle">Study pack</h2>
+      <button type="button" class="ghost" id="copy">Copy pack</button>
     </div>
-    <div class="meta" id="notesMeta"></div>
-    <div class="notes" id="notesBody"></div>
+    <div class="meta" id="packMeta"></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="panels"></div>
   </div>
 </div>
 
 <script>
-var API = localStorage.getItem("sf_api_base") || "https://study-forge.aaron-m-strasler.workers.dev";
+(function () {
+  var API = localStorage.getItem("sf_api_base") || "https://study-forge.aaron-m-strasler.workers.dev";
+  var currentPack = null;
 
-document.getElementById("go").onclick = async function () {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  await ping();
-  await refresh();
-  setInterval(refresh, 4000);
-};
+  function $(id) { return document.getElementById(id); }
 
-async function ping() {
-  var chip = document.getElementById("chip");
-  var hint = document.getElementById("hint");
-  try {
-    var res = await fetch(API + "/api/health");
-    var data = await res.json();
-    if (!data.ok) throw new Error("bad");
-    chip.className = "chip";
-    chip.textContent = data.groq ? "API + Groq" : "API up · need GROQ secret";
-    hint.textContent = "API " + API;
-  } catch (e) {
-    chip.className = "chip bad";
-    chip.textContent = "API offline";
-    hint.textContent = "Cannot reach " + API;
+  $("go").onclick = async function () {
+    $("login").style.display = "none";
+    $("app").style.display = "block";
+    await ping();
+    await refresh();
+    setInterval(refresh, 4000);
+  };
+
+  async function ping() {
+    try {
+      var res = await fetch(API + "/api/health");
+      var data = await res.json();
+      if (!data.ok) throw new Error("bad");
+      $("chip").className = "chip";
+      var bits = [];
+      if (data.lmstudio) bits.push("LM Studio");
+      if (data.groq) bits.push("Groq");
+      $("chip").textContent = bits.length ? ("API · " + bits.join(" + ")) : "API up · set LLM";
+      $("hint").textContent = "Free · " + API.replace(/^https?:\/\//, "");
+    } catch (e) {
+      $("chip").className = "chip bad";
+      $("chip").textContent = "API offline";
+      $("hint").textContent = "Cannot reach " + API;
+    }
   }
-}
 
-var drop = document.getElementById("drop");
-var file = document.getElementById("file");
-drop.onclick = function () { file.click(); };
-drop.ondragover = function (e) { e.preventDefault(); };
-drop.ondrop = function (e) {
-  e.preventDefault();
-  if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
-};
-file.onchange = function () {
-  if (file.files[0]) upload(file.files[0]);
-};
+  var drop = $("drop");
+  var file = $("file");
+  drop.onclick = function () { file.click(); };
+  drop.ondragover = function (e) { e.preventDefault(); };
+  drop.ondrop = function (e) {
+    e.preventDefault();
+    if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
+  };
+  file.onchange = function () { if (file.files[0]) upload(file.files[0]); };
 
-document.getElementById("clear").onclick = async function () {
-  if (!confirm("Clear failed jobs?")) return;
-  await fetch(API + "/api/jobs/clear-failed", { method: "POST" });
-  refresh();
-};
+  $("clear").onclick = async function () {
+    if (!confirm("Clear failed packs?")) return;
+    await fetch(API + "/api/jobs/clear-failed", { method: "POST" });
+    refresh();
+  };
 
-document.getElementById("copy").onclick = async function () {
-  var t = document.getElementById("notesBody").innerText;
-  if (!t) return;
-  try {
-    await navigator.clipboard.writeText(t);
-    alert("Copied");
-  } catch (e) {
-    alert("Copy manually");
+  $("copy").onclick = async function () {
+    if (!currentPack) return;
+    var t = packPlainText(currentPack);
+    try {
+      await navigator.clipboard.writeText(t);
+      alert("Copied — paste into Notion");
+    } catch (e) {
+      alert("Select text and copy manually");
+    }
+  };
+
+  function packPlainText(n) {
+    var parts = [];
+    parts.push("# " + (n.source_file || "Study pack"));
+    if (n.summary) parts.push("## Summary\n" + n.summary);
+    if (n.key_points) parts.push("## Key Points\n" + n.key_points);
+    if (n.definitions) parts.push("## Definitions\n" + n.definitions);
+    if (n.flashcards && n.flashcards.length) {
+      var fc = n.flashcards.map(function (c, i) {
+        return (i + 1) + ". Q: " + c.q + "\n   A: " + c.a;
+      }).join("\n");
+      parts.push("## Flashcards\n" + fc);
+    }
+    if (n.quiz && n.quiz.length) {
+      var qz = n.quiz.map(function (q, i) {
+        var o = (q.options || []).map(function (op) { return op.key + ") " + op.text; }).join("\n");
+        return (i + 1) + ". " + q.question + "\n" + o + "\nHint: " + (q.hint || "") + "\nExplain: " + (q.explanation || "");
+      }).join("\n\n");
+      parts.push("## Quiz (assistive)\n" + qz);
+    }
+    if (n.study_notes) parts.push("## Study Notes\n" + n.study_notes);
+    else if (n.full_notes) parts.push(n.full_notes);
+    return parts.join("\n\n");
   }
-};
 
-async function upload(f) {
-  var fd = new FormData();
-  fd.append("file", f);
-  try {
-    var res = await fetch(API + "/api/jobs", { method: "POST", body: fd });
+  async function upload(f) {
+    var fd = new FormData();
+    fd.append("file", f);
+    try {
+      var res = await fetch(API + "/api/jobs", { method: "POST", body: fd });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) {
+        alert(data.error || ("Upload failed " + res.status));
+        return;
+      }
+      await refresh();
+    } catch (e) {
+      alert(String(e.message || e));
+    }
+    file.value = "";
+  }
+
+  async function openPack(id, name) {
+    $("packBox").style.display = "block";
+    $("packTitle").textContent = name || "Study pack";
+    $("packMeta").textContent = "Loading…";
+    $("tabs").innerHTML = "";
+    $("panels").innerHTML = "";
+    var res = await fetch(API + "/api/jobs/" + id + "/result");
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok) {
-      alert(data.error || ("Upload failed " + res.status));
+      $("packMeta").textContent = data.error || data.detail || "No pack yet";
       return;
     }
-    await refresh();
-  } catch (e) {
-    alert(String(e.message || e));
+    currentPack = data.notes || {};
+    $("packMeta").textContent =
+      (currentPack.provider_used || "") + " · " + (currentPack.processed_at || "") +
+      " · assistive study pack · free";
+    renderPack(currentPack);
+    $("packBox").scrollIntoView({ behavior: "smooth", block: "start" });
   }
-  file.value = "";
-}
 
-async function openNotes(id, name) {
-  var box = document.getElementById("notesBox");
-  box.style.display = "block";
-  document.getElementById("notesTitle").textContent = name || "Notes";
-  document.getElementById("notesBody").textContent = "Loading…";
-  var res = await fetch(API + "/api/jobs/" + id + "/result");
-  var data = await res.json().catch(function () { return {}; });
-  if (!res.ok) {
-    document.getElementById("notesMeta").textContent = data.error || data.detail || "No notes";
-    document.getElementById("notesBody").textContent = "";
-    return;
+  function renderPack(n) {
+    var tabs = [];
+    if (n.summary) tabs.push(["summary", "Summary"]);
+    if (n.key_points) tabs.push(["points", "Key points"]);
+    if (n.definitions) tabs.push(["defs", "Definitions"]);
+    if (n.flashcards && n.flashcards.length) tabs.push(["cards", "Flashcards"]);
+    if (n.quiz && n.quiz.length) tabs.push(["quiz", "Quiz"]);
+    tabs.push(["full", "Full notes"]);
+
+    var tabHtml = "";
+    var panelHtml = "";
+    for (var i = 0; i < tabs.length; i++) {
+      var id = tabs[i][0];
+      var label = tabs[i][1];
+      tabHtml += "<button type=\"button\" class=\"tab" + (i === 0 ? " on" : "") + "\" data-tab=\"" + id + "\">" + label + "</button>";
+      panelHtml += "<div class=\"panel" + (i === 0 ? " on" : "") + "\" id=\"p-" + id + "\"></div>";
+    }
+    $("tabs").innerHTML = tabHtml;
+    $("panels").innerHTML = panelHtml;
+
+    if (n.summary) $("p-summary").innerHTML = "<div class=\"prose\"></div>";
+    if (n.summary) $("p-summary").querySelector(".prose").textContent = n.summary;
+    if (n.key_points) {
+      $("p-points").innerHTML = "<div class=\"prose\"></div>";
+      $("p-points").querySelector(".prose").textContent = n.key_points;
+    }
+    if (n.definitions) {
+      $("p-defs").innerHTML = "<div class=\"prose\"></div>";
+      $("p-defs").querySelector(".prose").textContent = n.definitions;
+    }
+    if (n.flashcards && n.flashcards.length) renderCards(n.flashcards);
+    if (n.quiz && n.quiz.length) renderQuiz(n.quiz);
+    $("p-full").innerHTML = "<div class=\"prose\"></div>";
+    $("p-full").querySelector(".prose").textContent = n.full_notes || n.study_notes || "";
+
+    var tabBtns = document.querySelectorAll(".tab");
+    for (var t = 0; t < tabBtns.length; t++) {
+      tabBtns[t].onclick = (function (btn) {
+        return function () {
+          var id = btn.getAttribute("data-tab");
+          document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
+          document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("on"); });
+          btn.classList.add("on");
+          var p = $("p-" + id);
+          if (p) p.classList.add("on");
+        };
+      })(tabBtns[t]);
+    }
   }
-  var n = data.notes || {};
-  document.getElementById("notesMeta").textContent = (n.provider_used || "") + " " + (n.processed_at || "");
-  document.getElementById("notesBody").textContent = n.full_notes || "";
-}
 
-async function dismiss(id) {
-  await fetch(API + "/api/jobs/" + id, { method: "DELETE" });
-  refresh();
-}
-
-function esc(s) {
-  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-async function refresh() {
-  try {
-    var res = await fetch(API + "/api/jobs");
-    if (!res.ok) {
-      document.getElementById("list").textContent = "HTTP " + res.status;
-      return;
+  function renderCards(cards) {
+    var el = $("p-cards");
+    el.innerHTML = "<p class=\"meta\">Tap a card to flip. Active recall — check yourself before revealing.</p>";
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i];
+      var div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML =
+        "<div class=\"q\"></div><div class=\"a\"></div><div class=\"hint-flip\">Tap to show answer</div>";
+      div.querySelector(".q").textContent = c.q || "";
+      div.querySelector(".a").textContent = c.a || "(no answer parsed)";
+      div.onclick = function () {
+        this.classList.toggle("show");
+        var h = this.querySelector(".hint-flip");
+        if (h) h.textContent = this.classList.contains("show") ? "Tap to hide" : "Tap to show answer";
+      };
+      el.appendChild(div);
     }
-    var data = await res.json();
-    var jobs = data.jobs || [];
-    if (!jobs.length) {
-      document.getElementById("list").innerHTML = "<p class=\"meta\">No jobs yet</p>";
-      return;
+  }
+
+  function renderQuiz(items) {
+    var el = $("p-quiz");
+    el.innerHTML =
+      "<p class=\"meta\">Assistive quiz — check understanding. After you pick, we show a short explanation (not a submit-ready answer key).</p>";
+    for (var i = 0; i < items.length; i++) {
+      (function (item, idx) {
+        var box = document.createElement("div");
+        box.className = "quiz-item";
+        var q = document.createElement("div");
+        q.className = "qq";
+        q.textContent = (idx + 1) + ". " + (item.question || "");
+        box.appendChild(q);
+        var opts = item.options || [];
+        for (var j = 0; j < opts.length; j++) {
+          (function (op) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "opt";
+            b.textContent = op.key + ") " + op.text;
+            b.onclick = function () {
+              var buttons = box.querySelectorAll(".opt");
+              for (var k = 0; k < buttons.length; k++) {
+                buttons[k].disabled = true;
+                var key = buttons[k].textContent.charAt(0);
+                if (key === item.answer) buttons[k].classList.add("correct");
+              }
+              if (op.key === item.answer) b.classList.add("correct");
+              else b.classList.add("wrong");
+              var teach = box.querySelector(".teach");
+              if (teach) {
+                teach.classList.add("on");
+                var bits = [];
+                if (item.hint) bits.push("Hint was: " + item.hint);
+                if (item.explanation) bits.push(item.explanation);
+                else bits.push("Correct option: " + item.answer + ". Review this idea in your notes.");
+                teach.innerHTML = "<strong>Learn:</strong> " + bits.join(" — ");
+              }
+            };
+            box.appendChild(b);
+          })(opts[j]);
+        }
+        if (item.hint) {
+          var hintBtn = document.createElement("button");
+          hintBtn.type = "button";
+          hintBtn.className = "ghost";
+          hintBtn.style.marginTop = "8px";
+          hintBtn.textContent = "Show hint";
+          hintBtn.onclick = function () {
+            alert(item.hint);
+          };
+          box.appendChild(hintBtn);
+        }
+        var teach = document.createElement("div");
+        teach.className = "teach";
+        box.appendChild(teach);
+        el.appendChild(box);
+      })(items[i], i);
     }
-    var html = "";
-    for (var i = 0; i < jobs.length; i++) {
-      var j = jobs[i];
-      var st = (j.status || "queued").toLowerCase();
-      html += "<div class=\"row\">";
-      html += "<div style=\"flex:1;min-width:0\"><div>" + esc(j.filename) + "</div>";
-      if (st === "failed" && j.error) html += "<div class=\"meta\" style=\"color:#F87171\">" + esc(j.error) + "</div>";
-      html += "</div><span class=\"st " + st + "\">" + st + "</span>";
-      if (st === "forged") {
-        html += " <button type=\"button\" class=\"ghost\" data-open=\"" + esc(j.id) + "\" data-name=\"" + esc(j.filename) + "\">Open</button>";
+  }
+
+  async function dismiss(id) {
+    await fetch(API + "/api/jobs/" + id, { method: "DELETE" });
+    refresh();
+  }
+
+  function esc(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  async function refresh() {
+    try {
+      var res = await fetch(API + "/api/jobs");
+      if (!res.ok) {
+        $("list").textContent = "HTTP " + res.status;
+        return;
       }
-      if (st === "failed") {
-        html += " <button type=\"button\" class=\"danger\" data-del=\"" + esc(j.id) + "\">Dismiss</button>";
+      var data = await res.json();
+      var jobs = data.jobs || [];
+      if (!jobs.length) {
+        $("list").innerHTML = "<p class=\"meta\">No packs yet — upload a .txt to forge one.</p>";
+        return;
       }
-      html += "</div>";
+      var html = "";
+      for (var i = 0; i < jobs.length; i++) {
+        var j = jobs[i];
+        var st = (j.status || "queued").toLowerCase();
+        html += "<div class=\"row\"><div style=\"flex:1;min-width:0\"><div>" + esc(j.filename) + "</div>";
+        if (st === "failed" && j.error) {
+          html += "<div class=\"meta\" style=\"color:var(--red)\">" + esc(j.error) + "</div>";
+        }
+        html += "</div><span class=\"st " + st + "\">" + st + "</span>";
+        if (st === "forged") {
+          html += " <button type=\"button\" class=\"ghost\" data-open=\"" + esc(j.id) + "\" data-name=\"" + esc(j.filename) + "\">Open pack</button>";
+        }
+        if (st === "failed") {
+          html += " <button type=\"button\" class=\"danger\" data-del=\"" + esc(j.id) + "\">Dismiss</button>";
+        }
+        html += "</div>";
+      }
+      $("list").innerHTML = html;
+      document.querySelectorAll("[data-open]").forEach(function (btn) {
+        btn.onclick = function () {
+          openPack(btn.getAttribute("data-open"), btn.getAttribute("data-name"));
+        };
+      });
+      document.querySelectorAll("[data-del]").forEach(function (btn) {
+        btn.onclick = function () { dismiss(btn.getAttribute("data-del")); };
+      });
+    } catch (e) {
+      $("list").textContent = String(e.message || e);
     }
-    document.getElementById("list").innerHTML = html;
-    var opens = document.querySelectorAll("[data-open]");
-    for (var a = 0; a < opens.length; a++) {
-      opens[a].onclick = (function (btn) {
-        return function () { openNotes(btn.getAttribute("data-open"), btn.getAttribute("data-name")); };
-      })(opens[a]);
-    }
-    var dels = document.querySelectorAll("[data-del]");
-    for (var b = 0; b < dels.length; b++) {
-      dels[b].onclick = (function (btn) {
-        return function () { dismiss(btn.getAttribute("data-del")); };
-      })(dels[b]);
-    }
-  } catch (e) {
-    document.getElementById("list").textContent = String(e.message || e);
   }
-}
+})();
 </script>
 </body>
 </html>
