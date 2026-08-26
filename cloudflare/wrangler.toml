@@ -2,6 +2,12 @@ name = "study-forge"
 main = "worker.js"
 compatibility_date = "2024-11-01"
 
+# Plain config (not secrets). Change the tunnel URL here when cloudflared gives a new one.
+[vars]
+LMSTUDIO_BASE_URL = "https://describe-allen-nominated-movement.trycloudflare.com"
+# Optional: must match the model name loaded in LM Studio
+# LMSTUDIO_MODEL = "local-model"
+
 [assets]
 directory = "../web"
 binding = "ASSETS"
