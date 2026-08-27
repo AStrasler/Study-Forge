@@ -1,5 +1,8 @@
 """
 Centralized configuration loaded from environment variables / .env file.
+
+Canonical names use private_* for the preferred private provider.
+local_model is an alias of private_model (ProviderManager compatibility).
 """
 
 from __future__ import annotations
@@ -24,10 +27,17 @@ class Settings:
     ollama_base_url: str = "http://localhost:11434"
 
     lmstudio_base_url: str = "http://localhost:1234"
-    lmstudio_model: str = "qwen2.5-3b-instruct"
+    lmstudio_model: str = "local-model"
+
+    fox_base_url: str = "http://localhost:8080"
+    fox_model: str = "llama3.2"
+    fox_timeout: int = 300
+
+    mullama_base_url: str = "http://localhost:11435"
+    mullama_model: str = "llama3.2"
 
     groq_api_key: Optional[str] = None
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "llama-3.1-8b-instant"
 
     cloudflare_api_token: Optional[str] = None
     cloudflare_account_id: Optional[str] = None
@@ -38,8 +48,9 @@ class Settings:
     gemini_api_key: Optional[str] = None
     huggingface_api_key: Optional[str] = None
 
+    # Deepnote BYOS path: prefer groq (or whatever is configured on the engine host)
     provider_fallback_order: List[str] = field(
-        default_factory=lambda: ["lmstudio", "ollama", "groq", "cloudflare"]
+        default_factory=lambda: ["groq", "lmstudio", "ollama", "fox", "mullama"]
     )
 
     notion_api_token: Optional[str] = None
@@ -54,6 +65,11 @@ class Settings:
     cloudflare_tunnel_token: Optional[str] = None
     cloudflare_zero_trust_auth_domain: Optional[str] = None
 
+    @property
+    def local_model(self) -> str:
+        """Alias used by ProviderManager / older code."""
+        return self.private_model
+
     @classmethod
     def load(cls, env_file: str | Path | None = None) -> "Settings":
         if env_file:
@@ -61,19 +77,35 @@ class Settings:
         else:
             load_dotenv()
 
+        # Prefer PRIVATE_MODEL; fall back to legacy LOCAL_MODEL
+        private_model = (
+            os.getenv("PRIVATE_MODEL")
+            or os.getenv("LOCAL_MODEL")
+            or "llama3.2:1b"
+        ).strip()
+
         order = os.getenv(
             "PROVIDER_FALLBACK_ORDER",
-            "lmstudio,ollama,groq,cloudflare",
+            "groq,lmstudio,ollama,fox,mullama",
         )
 
         return cls(
-            private_provider=os.getenv("PRIVATE_PROVIDER", "ollama").strip().lower(),
-            private_model=os.getenv("PRIVATE_MODEL", "llama3.2:1b").strip(),
+            private_provider=(
+                os.getenv("PRIVATE_PROVIDER") or os.getenv("LOCAL_PROVIDER") or "ollama"
+            )
+            .strip()
+            .lower(),
+            private_model=private_model,
             ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/"),
             lmstudio_base_url=os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234").rstrip("/"),
-            lmstudio_model=os.getenv("LMSTUDIO_MODEL", "qwen2.5-3b-instruct").strip(),
+            lmstudio_model=os.getenv("LMSTUDIO_MODEL", "local-model").strip(),
+            fox_base_url=os.getenv("FOX_BASE_URL", "http://localhost:8080").rstrip("/"),
+            fox_model=os.getenv("FOX_MODEL", private_model).strip(),
+            fox_timeout=int(os.getenv("FOX_TIMEOUT", os.getenv("PROVIDER_TIMEOUT", "300"))),
+            mullama_base_url=os.getenv("MULLAMA_BASE_URL", "http://localhost:11435").rstrip("/"),
+            mullama_model=os.getenv("MULLAMA_MODEL", private_model).strip(),
             groq_api_key=os.getenv("GROQ_API_KEY") or None,
-            groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip(),
+            groq_model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant").strip(),
             cloudflare_api_token=os.getenv("CLOUDFLARE_API_TOKEN") or None,
             cloudflare_account_id=os.getenv("CLOUDFLARE_ACCOUNT_ID") or None,
             cloudflare_access_key_id=os.getenv("CLOUDFLARE_ACCESS_KEY_ID") or None,

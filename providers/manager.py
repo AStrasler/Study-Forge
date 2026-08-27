@@ -13,6 +13,7 @@ from utils.logging import get_logger
 from .base import BaseProvider, ProviderError, ProviderResponse
 from .fox import FoxProvider
 from .groq import GroqProvider
+from .lmstudio import LMStudioProvider
 from .mullama import MullamaProvider
 from .ollama import OllamaProvider
 
@@ -26,24 +27,32 @@ class ProviderManager:
         self._build_providers()
 
     def _build_providers(self) -> None:
-        # Local — always register; is_available() gates use
+        model = getattr(self.settings, "local_model", None) or self.settings.private_model
+
         self._providers["ollama"] = OllamaProvider(
-            model=self.settings.local_model,
+            model=model,
             base_url=self.settings.ollama_base_url,
             timeout=self.settings.provider_timeout,
         )
-        self._providers["fox"] = FoxProvider(
-            model=self.settings.fox_model,
-            base_url=self.settings.fox_base_url,
-            timeout=self.settings.fox_timeout,
-        )
-        self._providers["mullama"] = MullamaProvider(
-            model=self.settings.mullama_model,
-            base_url=self.settings.mullama_base_url,
+
+        self._providers["lmstudio"] = LMStudioProvider(
+            model=self.settings.lmstudio_model,
+            base_url=self.settings.lmstudio_base_url,
             timeout=self.settings.provider_timeout,
         )
 
-        # Cloud — only when credentials exist
+        self._providers["fox"] = FoxProvider(
+            model=getattr(self.settings, "fox_model", model),
+            base_url=getattr(self.settings, "fox_base_url", "http://localhost:8080"),
+            timeout=int(getattr(self.settings, "fox_timeout", self.settings.provider_timeout)),
+        )
+
+        self._providers["mullama"] = MullamaProvider(
+            model=getattr(self.settings, "mullama_model", model),
+            base_url=getattr(self.settings, "mullama_base_url", "http://localhost:11435"),
+            timeout=self.settings.provider_timeout,
+        )
+
         if self.settings.groq_api_key:
             self._providers["groq"] = GroqProvider(
                 api_key=self.settings.groq_api_key,
@@ -51,14 +60,15 @@ class ProviderManager:
                 timeout=min(self.settings.provider_timeout, 120),
             )
 
-        # Future: cloudflare, gemini, huggingface
-
     def get_ordered_providers(self) -> List[BaseProvider]:
         ordered: List[BaseProvider] = []
         for name in self.settings.provider_fallback_order:
             provider = self._providers.get(name)
             if provider is not None:
                 ordered.append(provider)
+        # If order listed nothing registered, offer whatever we have
+        if not ordered:
+            ordered = list(self._providers.values())
         return ordered
 
     def generate(self, prompt: str, *, system: Optional[str] = None, **kwargs: Any) -> ProviderResponse:
@@ -67,7 +77,7 @@ class ProviderManager:
 
         if not ordered:
             raise ProviderError(
-                "No providers configured. Set LOCAL_PROVIDER/Ollama or a cloud API key.",
+                "No providers configured. Set GROQ_API_KEY on Deepnote or a private provider.",
                 provider="manager",
             )
 

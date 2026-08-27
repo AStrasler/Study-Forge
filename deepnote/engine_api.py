@@ -1,27 +1,23 @@
 """
 Study Forge — Deepnote BYOS engine
 ===================================
-Run on Deepnote with Incoming connections enabled (port 8080).
+Canonical Python pipeline over HTTP. Port 8080 for Deepnote Incoming connections.
 
   python deepnote/engine_api.py
 
-Or from repo root after pip install -r requirements.txt fastapi uvicorn.
-
-Endpoints:
-  GET  /health
-  POST /forge   JSON: { "text": "...", "filename": "notes.txt" }
-                optional header: X-Engine-Token: <ENGINE_AUTH_TOKEN>
+Env:
+  ENGINE_AUTH_TOKEN   required (fail closed)
+  GROQ_API_KEY        preferred inference on Deepnote (no device dependency)
+  PROVIDER_FALLBACK_ORDER  default groq,...
 """
 
 from __future__ import annotations
 
 import os
 import sys
-import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Allow importing Study Forge packages when cwd is deepnote/ or repo root
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -30,19 +26,28 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Study Forge Engine", version="0.1.0")
+app = FastAPI(title="Study Forge Engine", version="0.2.0")
+
+# Restrict later via ENGINE_CORS_ORIGINS; * only if unset (early BYOS)
+_cors = os.environ.get("ENGINE_CORS_ORIGINS", "*").strip()
+_origins = [o.strip() for o in _cors.split(",") if o.strip()] if _cors != "*" else ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_origins=_origins,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
+MAX_TEXT_CHARS = int(os.environ.get("ENGINE_MAX_TEXT_CHARS", "200000"))
 
-def _check_token(x_engine_token: str | None) -> None:
-    expected = os.environ.get("ENGINE_AUTH_TOKEN", "").strip()
+
+def _require_token(x_engine_token: str | None) -> None:
+    expected = (os.environ.get("ENGINE_AUTH_TOKEN") or "").strip()
     if not expected:
-        return  # open on private Deepnote URL; set token for production
+        raise HTTPException(
+            status_code=503,
+            detail="ENGINE_AUTH_TOKEN is not configured (fail closed)",
+        )
     if not x_engine_token or x_engine_token.strip() != expected:
         raise HTTPException(status_code=401, detail="Invalid or missing X-Engine-Token")
 
@@ -52,181 +57,83 @@ class ForgeRequest(BaseModel):
     filename: str = "upload.txt"
 
 
-class ForgeResponse(BaseModel):
-    ok: bool
-    filename: str
-    provider_used: str | None = None
-    processed_at: str
-    pack: dict
-    error: str | None = None
-
-
 @app.get("/health")
 def health():
+    """Operational state only — does not advertise which keys exist."""
+    token_ok = bool((os.environ.get("ENGINE_AUTH_TOKEN") or "").strip())
+    # Inference ready if any preferred path could work (presence only, not live probe)
+    inference = bool(
+        (os.environ.get("GROQ_API_KEY") or "").strip()
+        or (os.environ.get("LMSTUDIO_BASE_URL") or "").strip()
+        or (os.environ.get("OLLAMA_BASE_URL") or "").strip()
+    )
     return {
-        "ok": True,
-        "service": "study-forge-deepnote-engine",
-        "version": "0.1.0",
+        "ok": token_ok and inference,
+        "service": "study-forge-engine",
+        "version": "0.2.0",
         "host": "deepnote",
+        "pipeline": "ready",
+        "inference": "ready" if inference else "not_configured",
+        "auth": "ready" if token_ok else "not_configured",
         "time": datetime.now(timezone.utc).isoformat(),
-        "has_groq": bool(os.environ.get("GROQ_API_KEY")),
-        "has_lmstudio": bool(os.environ.get("LMSTUDIO_BASE_URL")),
-        "token_required": bool(os.environ.get("ENGINE_AUTH_TOKEN", "").strip()),
     }
 
 
-@app.post("/forge", response_model=ForgeResponse)
+@app.post("/forge")
 def forge(
     body: ForgeRequest,
     x_engine_token: str | None = Header(default=None),
 ):
-    _check_token(x_engine_token)
+    _require_token(x_engine_token)
+
     text = body.text.strip()
     if len(text) < 10:
         raise HTTPException(status_code=400, detail="text too short")
+    if len(text) > MAX_TEXT_CHARS:
+        raise HTTPException(
+            status_code=413,
+            detail=f"text exceeds ENGINE_MAX_TEXT_CHARS ({MAX_TEXT_CHARS})",
+        )
 
-    processed_at = datetime.now(timezone.utc).isoformat()
-
-    # Prefer full Python pipeline when available
     try:
-        pack = _run_pipeline(text, body.filename)
-        return ForgeResponse(
-            ok=True,
-            filename=body.filename,
-            provider_used=pack.get("provider_used"),
-            processed_at=processed_at,
-            pack=pack,
+        from config.settings import Settings
+        from pipeline.processor import process_text
+        from providers.manager import ProviderManager
+
+        settings = Settings.load()
+        # On Deepnote we usually don't want Notion side-effects unless configured
+        manager = ProviderManager(settings)
+        pack = process_text(
+            text,
+            source_name=body.filename or "upload.txt",
+            settings=settings,
+            providers=manager,
+            save_local=True,
         )
-    except Exception as first_err:
-        # Fallback: single-shot via env-configured OpenAI-compatible endpoint
-        try:
-            pack = _run_simple_pack(text, body.filename)
-            pack["pipeline_error"] = str(first_err)[:300]
-            return ForgeResponse(
-                ok=True,
-                filename=body.filename,
-                provider_used=pack.get("provider_used"),
-                processed_at=processed_at,
-                pack=pack,
-            )
-        except Exception as second_err:
-            return ForgeResponse(
-                ok=False,
-                filename=body.filename,
-                processed_at=processed_at,
-                pack={},
-                error=f"pipeline: {first_err!s}; simple: {second_err!s}"[:800],
-            )
-
-
-def _run_pipeline(text: str, filename: str) -> dict:
-    """Use existing Study Forge pipeline if imports work."""
-    from config.settings import Settings
-    from providers.manager import ProviderManager
-    from pipeline.processor import process_text  # type: ignore
-
-    settings = Settings.load()
-    manager = ProviderManager(settings)
-    result = process_text(
-        text=text,
-        source_name=filename,
-        settings=settings,
-        providers=manager,
-    )
-    if isinstance(result, dict):
-        return result
-    # object with attributes
-    return {
-        "source_file": filename,
-        "summary": getattr(result, "summary", "") or "",
-        "key_points": getattr(result, "key_points", "") or "",
-        "definitions": getattr(result, "definitions", "") or "",
-        "flashcards": getattr(result, "flashcards", []) or [],
-        "full_notes": getattr(result, "synthesized", "") or str(result),
-        "provider_used": getattr(result, "provider_used", None),
-        "host": "deepnote",
-    }
-
-
-def _run_simple_pack(text: str, filename: str) -> dict:
-    """Minimal pack via LM Studio or Groq — no full agent graph."""
-    import json
-    import urllib.request
-
-    system = (
-        "You are Study Forge. Build a study pack. Assistive, not homework answers.\n"
-        "Use headers: ## Summary, ## Key Points, ## Definitions, ## Flashcards, ## Quiz, ## Study Notes\n"
-        "Flashcards as Q: / A: lines. Quiz with A) B) C) D), Hint, Answer, Explanation."
-    )
-    user = text[:14000]
-
-    lm = (os.environ.get("LMSTUDIO_BASE_URL") or "").rstrip("/")
-    if lm:
-        url = lm + ("/chat/completions" if "/v1" in lm else "/v1/chat/completions")
-        model = os.environ.get("LMSTUDIO_MODEL") or "local-model"
-        payload = {
-            "model": model,
-            "temperature": 0.3,
-            "max_tokens": 3200,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-        }
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=180) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        content = data["choices"][0]["message"]["content"]
+        pack["host"] = "deepnote"
         return {
-            "source_file": filename,
-            "full_notes": content,
-            "provider_used": "lmstudio",
-            "host": "deepnote",
+            "ok": True,
+            "filename": body.filename,
+            "provider_used": pack.get("provider_used"),
+            "processed_at": pack.get("processed_at"),
+            "pack": pack,
+            "error": None,
         }
-
-    key = os.environ.get("GROQ_API_KEY") or ""
-    if key:
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        model = os.environ.get("GROQ_MODEL") or "llama-3.1-8b-instant"
-        payload = {
-            "model": model,
-            "temperature": 0.3,
-            "max_tokens": 3200,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-        }
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {key}",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        content = data["choices"][0]["message"]["content"]
+    except HTTPException:
+        raise
+    except Exception as exc:
         return {
-            "source_file": filename,
-            "full_notes": content,
-            "provider_used": "groq",
-            "host": "deepnote",
+            "ok": False,
+            "filename": body.filename,
+            "provider_used": None,
+            "processed_at": datetime.now(timezone.utc).isoformat(),
+            "pack": {},
+            "error": str(exc)[:800],
         }
-
-    raise RuntimeError("Set LMSTUDIO_BASE_URL or GROQ_API_KEY in Deepnote env vars")
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    # Deepnote incoming connections only expose 8080
     port = int(os.environ.get("PORT", "8080"))
     uvicorn.run(app, host="0.0.0.0", port=port)

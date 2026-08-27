@@ -1,13 +1,13 @@
 /**
- * Study Forge Worker
- * 1) LM Studio (LMSTUDIO_BASE_URL)  2) Groq (GROQ_API_KEY)
- * Produces a full study pack: summary, points, definitions, cards, assistive quiz
+ * Study Forge Worker — orchestration only when Deepnote is configured.
+ * Prefer: DEEPNOTE_ENGINE_URL + ENGINE_AUTH_TOKEN → full Python pipeline
+ * Legacy fallback: in-worker LM Studio / Groq (until Deepnote is wired)
  */
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Engine-Token",
 };
 
 function json(data, status) {
@@ -15,6 +15,37 @@ function json(data, status) {
     status: status || 200,
     headers: { "Content-Type": "application/json", ...CORS },
   });
+}
+
+async function forgeViaDeepnote(env, text, filename) {
+  const base = (env.DEEPNOTE_ENGINE_URL || "").replace(/\/$/, "");
+  const token = env.ENGINE_AUTH_TOKEN || "";
+  if (!base) return null;
+
+  const res = await fetch(base + "/forge", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Engine-Token": token,
+    },
+    body: JSON.stringify({ text: text.slice(0, 180000), filename: filename || "upload.txt" }),
+  });
+  const data = await res.json().catch(function () {
+    return {};
+  });
+  if (!res.ok) {
+    throw new Error("Deepnote HTTP " + res.status + ": " + (data.detail || data.error || res.statusText));
+  }
+  if (!data.ok) {
+    throw new Error(data.error || "Deepnote forge failed");
+  }
+  const pack = data.pack || {};
+  pack.host = "deepnote";
+  pack.provider_used = data.provider_used || pack.provider_used || "deepnote";
+  pack.processed_at = data.processed_at || pack.processed_at || new Date().toISOString();
+  if (!pack.full_notes && pack.synthesized) pack.full_notes = pack.synthesized;
+  if (!pack.study_notes && pack.synthesized) pack.study_notes = pack.synthesized;
+  return pack;
 }
 
 async function chat(env, system, user) {
@@ -38,7 +69,8 @@ async function chat(env, system, user) {
     });
     if (!res.ok) throw new Error("LM Studio " + res.status + ": " + (await res.text()).slice(0, 300));
     const data = await res.json();
-    const text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+    const text =
+      (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
     if (!text.trim()) throw new Error("LM Studio empty response");
     return { text: text.trim(), provider: "lmstudio" };
   }
@@ -63,12 +95,13 @@ async function chat(env, system, user) {
     });
     if (!res.ok) throw new Error("Groq " + res.status + ": " + (await res.text()).slice(0, 300));
     const data = await res.json();
-    const text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+    const text =
+      (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
     if (!text.trim()) throw new Error("Groq empty response");
     return { text: text.trim(), provider: "groq" };
   }
 
-  throw new Error("No LLM configured. Set LMSTUDIO_BASE_URL or GROQ_API_KEY.");
+  throw new Error("No engine: set DEEPNOTE_ENGINE_URL or GROQ_API_KEY");
 }
 
 function section(md, name) {
@@ -92,14 +125,9 @@ function parseFlashcards(block) {
     } else if (am && q) {
       cards.push({ q: q, a: am[1].trim() });
       q = null;
-    } else if (q && line && !am) {
-      // continuation of answer or question
     }
   }
   if (q) cards.push({ q: q, a: "" });
-  if (!cards.length && block.length > 20) {
-    cards.push({ q: "Review this section", a: block.slice(0, 500) });
-  }
   return cards.slice(0, 12);
 }
 
@@ -127,10 +155,33 @@ function parseQuiz(block) {
       options: opts,
       hint: hintM ? hintM[1].trim() : "",
       explanation: expM ? expM[1].trim() : "",
-      answer: ansM ? ansM[1].toUpperCase() : (opts[0] ? opts[0].key : ""),
+      answer: ansM ? ansM[1].toUpperCase() : opts[0] ? opts[0].key : "",
     });
   }
   return items.slice(0, 8);
+}
+
+async function processJobLegacy(env, text, filename) {
+  const system =
+    "You are Study Forge. Build a complete study pack.\n" +
+    "Assistive learning only — not homework answer keys.\n" +
+    "## Summary\n## Key Points\n## Definitions\n## Flashcards\n## Quiz\n## Study Notes\n";
+  const out = await chat(env, system, text.slice(0, 14000));
+  const md = out.text;
+  return {
+    source_file: filename,
+    summary: section(md, "Summary"),
+    key_points: section(md, "Key Points"),
+    definitions: section(md, "Definitions"),
+    flashcards: parseFlashcards(section(md, "Flashcards")),
+    quiz: parseQuiz(section(md, "Quiz")),
+    study_notes: section(md, "Study Notes") || md,
+    full_notes: md,
+    provider_used: out.provider,
+    processed_at: new Date().toISOString(),
+    host: "cloudflare-legacy",
+    assistive: true,
+  };
 }
 
 async function processJob(env, jobId) {
@@ -144,42 +195,14 @@ async function processJob(env, jobId) {
     const obj = await env.FILES.get(row.r2_key);
     if (!obj) throw new Error("File missing in R2");
     const text = new TextDecoder("utf-8").decode(new Uint8Array(await obj.arrayBuffer())).trim();
-    if (text.length < 10) throw new Error("Text too short — use a .txt study file");
+    if (text.length < 10) throw new Error("Text too short — use a text-based study file for now");
 
-    const system =
-      "You are Study Forge. Build a complete study pack for a student from their material.\n" +
-      "Be accurate and assistive: help them learn, do not write answers meant for submitting as homework.\n" +
-      "Use EXACTLY these markdown headers in order:\n" +
-      "## Summary\n## Key Points\n## Definitions\n## Flashcards\n## Quiz\n## Study Notes\n\n" +
-      "Flashcards format each as:\nQ: ...\nA: ...\n\n" +
-      "Quiz: 4-6 multiple choice. For each:\n" +
-      "1. Question text\nA) ...\nB) ...\nC) ...\nD) ...\nHint: one helpful nudge (not the full answer)\nAnswer: A\nExplanation: why that option is correct (teach the concept)\n\n" +
-      "No preamble before ## Summary.";
-
-    const out = await chat(env, system, text.slice(0, 14000));
-    const md = out.text;
-
-    const summary = section(md, "Summary");
-    const key_points = section(md, "Key Points");
-    const definitions = section(md, "Definitions");
-    const flashBlock = section(md, "Flashcards");
-    const quizBlock = section(md, "Quiz");
-    const study_notes = section(md, "Study Notes") || md;
-
-    const result = {
-      source_file: row.filename,
-      summary: summary,
-      key_points: key_points,
-      definitions: definitions,
-      flashcards: parseFlashcards(flashBlock),
-      quiz: parseQuiz(quizBlock),
-      study_notes: study_notes,
-      full_notes: md,
-      provider_used: out.provider,
-      processed_at: new Date().toISOString(),
-      host: "cloudflare",
-      assistive: true,
-    };
+    let result;
+    if (env.DEEPNOTE_ENGINE_URL) {
+      result = await forgeViaDeepnote(env, text, row.filename);
+    } else {
+      result = await processJobLegacy(env, text, row.filename);
+    }
 
     const resultKey = "results/" + jobId + ".json";
     await env.FILES.put(resultKey, JSON.stringify(result, null, 2), {
@@ -210,10 +233,10 @@ async function handleApi(request, env, ctx) {
     return json({
       ok: true,
       service: "study-forge",
-      version: "0.7.0",
+      version: "0.8.0",
       host: "cloudflare",
-      lmstudio: Boolean(env.LMSTUDIO_BASE_URL),
-      groq: Boolean(env.GROQ_API_KEY),
+      deepnote: Boolean(env.DEEPNOTE_ENGINE_URL),
+      legacy_inference: Boolean(env.LMSTUDIO_BASE_URL || env.GROQ_API_KEY),
       free: true,
     });
   }

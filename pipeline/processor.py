@@ -4,6 +4,8 @@ Core processing pipeline.
 Processes files sequentially. One failure does not abort the batch.
 Always preserves generated results to disk so Notion failures cannot
 lose study material.
+
+Also exposes process_text() for HTTP engines (Deepnote) without a path on disk.
 """
 
 from __future__ import annotations
@@ -11,7 +13,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from agents import color_coder, definitions, flashcards, judge, key_points, summarizer
 from config.settings import Settings
@@ -21,21 +23,50 @@ from utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-SUPPORTED_SUFFIXES = {".pdf", ".docx", ".pptx", ".txt", ".md", ".markdown"}
+SUPPORTED_SUFFIXES = {
+    ".pdf",
+    ".docx",
+    ".pptx",
+    ".txt",
+    ".md",
+    ".markdown",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".tif",
+    ".tiff",
+    ".bmp",
+    ".gif",
+    ".xlsx",
+    ".xlsm",
+}
 
 
-def process_single_file(path: Path, settings: Settings, manager: ProviderManager) -> Dict[str, Any]:
-    """Run the full agent pipeline on one file."""
-    logger.info("Processing: %s", path.name)
+def process_text(
+    text: str,
+    *,
+    source_name: str = "upload.txt",
+    settings: Optional[Settings] = None,
+    providers: Optional[ProviderManager] = None,
+    save_local: bool = True,
+) -> Dict[str, Any]:
+    """Canonical in-memory pipeline entry (Deepnote / API)."""
+    if settings is None:
+        settings = Settings.load()
+    if providers is None:
+        providers = ProviderManager(settings)
 
-    text = extract_text(path)
-    if not text.strip():
-        raise ValueError(f"No extractable text in {path.name}")
+    body = (text or "").strip()
+    if not body:
+        raise ValueError(f"No extractable text for {source_name}")
 
-    summary = summarizer.run(text, manager)
-    points = key_points.run(text, manager)
-    cards = flashcards.run(text, manager)
-    defs = definitions.run(text, manager)
+    logger.info("Processing text: %s (%d chars)", source_name, len(body))
+
+    summary = summarizer.run(body, providers)
+    points = key_points.run(body, providers)
+    cards = flashcards.run(body, providers)
+    defs = definitions.run(body, providers)
 
     agent_outputs = {
         "summary": summary.text,
@@ -44,25 +75,30 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
         "definitions": defs.text,
     }
 
-    synthesized = judge.run(agent_outputs, manager)
-    colored_response, color_segments = color_coder.run(synthesized.text, manager)
+    synthesized = judge.run(agent_outputs, providers)
+    colored_response, color_segments = color_coder.run(synthesized.text, providers)
 
     result: Dict[str, Any] = {
-        "source_file": path.name,
+        "source_file": source_name,
         "summary": summary.text,
         "key_points": points.text,
         "flashcards": cards.text,
         "definitions": defs.text,
         "synthesized": synthesized.text,
+        "full_notes": synthesized.text,
+        "study_notes": synthesized.text,
         "color_coded_raw": colored_response.text,
         "color_segments": color_segments,
         "provider_used": synthesized.provider,
         "processed_at": datetime.now(timezone.utc).isoformat(),
+        "host": "pipeline",
+        "assistive": True,
     }
 
-    local_path = _save_local_result(result, settings)
-    result["local_result_path"] = str(local_path)
-    logger.info("Saved local result: %s", local_path)
+    if save_local:
+        local_path = _save_local_result(result, settings)
+        result["local_result_path"] = str(local_path)
+        logger.info("Saved local result: %s", local_path)
 
     if settings.notion_api_token and settings.notion_database_id:
         try:
@@ -70,19 +106,27 @@ def process_single_file(path: Path, settings: Settings, manager: ProviderManager
 
             ok = push_to_notion(result, settings)
             result["notion_pushed"] = bool(ok)
-            if not ok:
-                result["notion_error"] = "push_to_notion returned False"
-                _save_local_result(result, settings)
         except Exception as exc:
-            logger.error("Notion push failed for %s: %s", path.name, exc)
+            logger.error("Notion push failed for %s: %s", source_name, exc)
             result["notion_pushed"] = False
             result["notion_error"] = str(exc)
-            _save_local_result(result, settings)
     else:
         result["notion_pushed"] = False
-        logger.info("Notion not configured — local result only")
 
     return result
+
+
+def process_single_file(path: Path, settings: Settings, manager: ProviderManager) -> Dict[str, Any]:
+    """Run the full agent pipeline on one file."""
+    logger.info("Processing: %s", path.name)
+    text = extract_text(path)
+    return process_text(
+        text,
+        source_name=path.name,
+        settings=settings,
+        providers=manager,
+        save_local=True,
+    )
 
 
 def _save_local_result(result: Dict[str, Any], settings: Settings) -> Path:
