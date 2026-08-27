@@ -1,0 +1,4 @@
+# Extra deps for Deepnote engine API (on top of repo requirements.txt)
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.0.0
