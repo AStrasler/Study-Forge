@@ -1,4 +1,4 @@
-"""File ingestion and text extraction."""
+"""File ingestion and text extraction (including OCR)."""
 
 from .extractors import extract_text
 

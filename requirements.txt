@@ -13,8 +13,16 @@ pypdf>=4.0.0
 python-docx>=1.1.0
 python-pptx>=1.0.0
 
+# Better PDF text + render pages for OCR
+pymupdf>=1.24.0
+
+# Spreadsheets
+openpyxl>=3.1.0
+# Optional legacy .xls: xlrd>=2.0.0
+
+# OCR (also needs system package: tesseract-ocr)
+pillow>=10.0.0
+pytesseract>=0.3.10
+
 # Notion client
 notion-client>=2.2.0
-
-# Optional: structured logging / progress (kept light)
-# rich>=13.0.0
