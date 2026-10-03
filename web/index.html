@@ -52,6 +52,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
 <div id="login" class="box">
   <div class="top"><h1>Study Forge</h1><span class="badge-free">Free · your keys</span></div>
   <p class="sub">Upload materials → full study pack (summary, cards, assistive quiz). Copy to Notion yourself. Not a homework answer key.</p>
+  <input id="token" type="password" autocomplete="off" placeholder="API token (saved in this browser)" style="width:100%;margin:0 0 12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0F1216;color:var(--bone);font:inherit">
   <button class="primary" type="button" id="go" style="width:100%">Enter the forge</button>
 </div>
 
@@ -97,7 +98,29 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
 
   function $(id) { return document.getElementById(id); }
 
+  var savedToken = localStorage.getItem("sf_api_token") || "";
+  if (savedToken) $("token").value = savedToken;
+
+  function apiFetch(path, opts) {
+    opts = opts || {};
+    var headers = {};
+    if (opts.headers) {
+      for (var k in opts.headers) headers[k] = opts.headers[k];
+    }
+    headers.Authorization = "Bearer " + (localStorage.getItem("sf_api_token") || "");
+    var next = {};
+    for (var key in opts) next[key] = opts[key];
+    next.headers = headers;
+    return fetch(API + path, next);
+  }
+
   $("go").onclick = async function () {
+    var token = ($("token").value || "").trim();
+    if (!token) {
+      alert("Paste the API token first");
+      return;
+    }
+    localStorage.setItem("sf_api_token", token);
     $("login").style.display = "none";
     $("app").style.display = "block";
     await ping();
@@ -107,7 +130,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
 
   async function ping() {
     try {
-      var res = await fetch(API + "/api/health");
+      var res = await apiFetch("/api/health");
       var data = await res.json();
       if (!data.ok) throw new Error("bad");
       $("chip").className = "chip";
@@ -135,7 +158,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
 
   $("clear").onclick = async function () {
     if (!confirm("Clear failed packs?")) return;
-    await fetch(API + "/api/jobs/clear-failed", { method: "POST" });
+    await apiFetch("/api/jobs/clear-failed", { method: "POST" });
     refresh();
   };
 
@@ -178,7 +201,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
     var fd = new FormData();
     fd.append("file", f);
     try {
-      var res = await fetch(API + "/api/jobs", { method: "POST", body: fd });
+      var res = await apiFetch("/api/jobs", { method: "POST", body: fd });
       var data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
         alert(data.error || ("Upload failed " + res.status));
@@ -197,7 +220,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
     $("packMeta").textContent = "Loading…";
     $("tabs").innerHTML = "";
     $("panels").innerHTML = "";
-    var res = await fetch(API + "/api/jobs/" + id + "/result");
+    var res = await apiFetch("/api/jobs/" + id + "/result");
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok) {
       $("packMeta").textContent = data.error || data.detail || "No pack yet";
@@ -342,7 +365,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
   }
 
   async function dismiss(id) {
-    await fetch(API + "/api/jobs/" + id, { method: "DELETE" });
+    await apiFetch("/api/jobs/" + id, { method: "DELETE" });
     refresh();
   }
 
@@ -356,7 +379,7 @@ button{cursor:pointer;border:0;border-radius:8px;padding:9px 12px;font-weight:60
 
   async function refresh() {
     try {
-      var res = await fetch(API + "/api/jobs");
+      var res = await apiFetch("/api/jobs");
       if (!res.ok) {
         $("list").textContent = "HTTP " + res.status;
         return;
