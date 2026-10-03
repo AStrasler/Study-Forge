@@ -31,3 +31,13 @@ wrangler deploy
 4. Queue should show the file as **queued**
 
 Upload stores the file in R2 and a row in D1. AI processing still runs via local `python main.py` until wired later.
+
+### API auth token
+
+`/api` fails closed unless the Worker has its own secret `API_AUTH_TOKEN` (do not reuse `ENGINE_AUTH_TOKEN`).
+
+```bash
+wrangler secret put API_AUTH_TOKEN
+```
+
+Generate the value yourself and paste it when prompted. Do not commit it. On the site, paste the same value once into **Enter the forge** (stored in this browser only).
