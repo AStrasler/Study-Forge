@@ -4,17 +4,40 @@
  * Legacy fallback: in-worker LM Studio / Groq (until Deepnote is wired)
  */
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Engine-Token",
-};
+const ALLOWED_ORIGINS = [
+  "https://study-forge.aaron-m-strasler.workers.dev",
+  "https://studyforge.studio",
+];
 
-function json(data, status) {
+function corsHeaders(request) {
+  const headers = {
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Engine-Token",
+    Vary: "Origin",
+  };
+  const origin = request && request.headers ? request.headers.get("Origin") : "";
+  if (origin && ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
+
+function json(data, status, request) {
   return new Response(JSON.stringify(data), {
     status: status || 200,
-    headers: { "Content-Type": "application/json", ...CORS },
+    headers: { "Content-Type": "application/json", ...corsHeaders(request) },
   });
+}
+
+function requireApiAuth(request, env) {
+  const token = env.API_AUTH_TOKEN;
+  if (typeof token !== "string" || token.trim() === "") {
+    return json({ error: "API auth is not configured" }, 503, request);
+  }
+  if ((request.headers.get("Authorization") || "") !== "Bearer " + token) {
+    return json({ error: "unauthorized" }, 401, request);
+  }
+  return null;
 }
 
 async function forgeViaDeepnote(env, text, filename) {
@@ -223,11 +246,14 @@ async function processJob(env, jobId) {
 
 async function handleApi(request, env, ctx) {
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS });
+    return new Response(null, { status: 204, headers: corsHeaders(request) });
   }
 
+  const authError = requireApiAuth(request, env);
+  if (authError) return authError;
+
   const path = new URL(request.url).pathname;
-  if (!env.DB || !env.FILES) return json({ error: "DB or FILES binding missing" }, 503);
+  if (!env.DB || !env.FILES) return json({ error: "DB or FILES binding missing" }, 503, request);
 
   if (path === "/api/health") {
     return json({
@@ -238,7 +264,7 @@ async function handleApi(request, env, ctx) {
       deepnote: Boolean(env.DEEPNOTE_ENGINE_URL),
       legacy_inference: Boolean(env.LMSTUDIO_BASE_URL || env.GROQ_API_KEY),
       free: true,
-    });
+    }, 200, request);
   }
 
   if (path === "/api/jobs/clear-failed" && request.method === "POST") {
@@ -252,20 +278,20 @@ async function handleApi(request, env, ctx) {
       } catch (e) {}
     }
     await env.DB.prepare("DELETE FROM jobs WHERE status = 'failed'").run();
-    return json({ cleared: (results || []).length });
+    return json({ cleared: (results || []).length }, 200, request);
   }
 
   if (path === "/api/jobs" && request.method === "GET") {
     const { results } = await env.DB.prepare(
       "SELECT id, filename, status, created_at, updated_at, error, result_r2_key FROM jobs ORDER BY created_at DESC LIMIT 50"
     ).all();
-    return json({ jobs: results || [] });
+    return json({ jobs: results || [] }, 200, request);
   }
 
   if (path === "/api/jobs" && request.method === "POST") {
     const form = await request.formData();
     const file = form.get("file");
-    if (!file || typeof file === "string") return json({ error: "file required" }, 400);
+    if (!file || typeof file === "string") return json({ error: "file required" }, 400, request);
     const filename = file.name || "upload.txt";
     const id = crypto.randomUUID();
     const key = "uploads/" + id + "/" + filename;
@@ -280,36 +306,36 @@ async function handleApi(request, env, ctx) {
       .run();
     if (ctx && ctx.waitUntil) ctx.waitUntil(processJob(env, id));
     else await processJob(env, id);
-    return json({ id: id, filename: filename, status: "queued" }, 201);
+    return json({ id: id, filename: filename, status: "queued" }, 201, request);
   }
 
   const resultMatch = path.match(/^\/api\/jobs\/([^/]+)\/result$/);
   if (resultMatch && request.method === "GET") {
     const id = resultMatch[1];
     const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(id).first();
-    if (!row) return json({ error: "not found" }, 404);
+    if (!row) return json({ error: "not found" }, 404, request);
     if (row.status !== "forged" || !row.result_r2_key) {
-      return json({ error: "no notes yet", status: row.status, detail: row.error }, 404);
+      return json({ error: "no notes yet", status: row.status, detail: row.error }, 404, request);
     }
     const obj = await env.FILES.get(row.result_r2_key);
-    if (!obj) return json({ error: "result missing" }, 404);
-    return json({ job: { id: row.id, filename: row.filename }, notes: await obj.json() });
+    if (!obj) return json({ error: "result missing" }, 404, request);
+    return json({ job: { id: row.id, filename: row.filename }, notes: await obj.json() }, 200, request);
   }
 
   const delMatch = path.match(/^\/api\/jobs\/([^/]+)$/);
   if (delMatch && request.method === "DELETE") {
     const id = delMatch[1];
     const row = await env.DB.prepare("SELECT * FROM jobs WHERE id = ?").bind(id).first();
-    if (!row) return json({ error: "not found" }, 404);
+    if (!row) return json({ error: "not found" }, 404, request);
     try {
       if (row.r2_key) await env.FILES.delete(row.r2_key);
       if (row.result_r2_key) await env.FILES.delete(row.result_r2_key);
     } catch (e) {}
     await env.DB.prepare("DELETE FROM jobs WHERE id = ?").bind(id).run();
-    return json({ deleted: id });
+    return json({ deleted: id }, 200, request);
   }
 
-  return json({ error: "not found", path: path }, 404);
+  return json({ error: "not found", path: path }, 404, request);
 }
 
 export default {
@@ -320,7 +346,7 @@ export default {
       if (env.ASSETS) return env.ASSETS.fetch(request);
       return new Response("Study Forge", { status: 200 });
     } catch (err) {
-      return json({ error: String(err && err.message ? err.message : err) }, 500);
+      return json({ error: String(err && err.message ? err.message : err) }, 500, request);
     }
   },
 };
